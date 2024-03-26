@@ -54,17 +54,45 @@ class Game:
             {"name": "eastern_australia", "troops": 0, "owner": None, "continent": "oceania", "neighbours": ["new_guinea", "western_australia"]}
         ]
 
+    
+    def __str__(self) -> None:
+        ret = "Players:\n"
+        for player in self.players:
+            ret += str(player) + "\n"
+        ret += "Map:\n"
+        for territory in self.map:
+            ret += f"{territory["name"]} of {territory["owner"].name} occupied by {territory["troops"]} troops\n"
+
+        return ret
+
+
+    def match(self) -> None:
+        self.status = "Game is running..."
+        
+        turn = 0
+
+        for player in self.players:
+            receiving_troops = int(self.__from_player_receive_number_of_territories(player)/3)
+
+            if (int (turn/3) % 3 == 0):
+                receiving_troops += randint(8, 12) # BONUS!
+
+            # sending number of troops to client player
+            # receiving map from client player
+            # updating map
+            # sending updated map to client player
+            
+
         
     def current_game_status(self) -> str:
         return f"Game ID: {self.game_id}\nPlayers: {self.players}" 
 
     def join_players(self, player1: str, player2: str, player3: str) -> None:
-        self.add_player(player1)
-        self.add_player(player2)
-        self.add_player(player3)
-        self.shuffle_players()
+        self.__add_player(player1)
+        self.__add_player(player2)
+        self.__add_player(player3)
+        self.__shuffle_players()
 
-    
     def assigning_map_randomly(self) -> None:
         for player in self.players:
             territories_assigned = 0
@@ -81,17 +109,19 @@ class Game:
         for updated_territory in updated_map:
             self.map[self.map.index(updated_territory)]["troops"] = updated_territory["troops"]
 
+    def __from_player_receive_number_of_territories(self, player: Player) -> int:
+        territories = 0
+        for territory in self.map:
+            if territory["owner"] == player:
+                territories += 1
+        return territories
 
-    def add_player(self, player: str) -> None:
+    def __add_player(self, player: str) -> None:
         self.players.append(Player(player, self.possible_goals.pop(randint(0, len(self.possible_goals)-1))))
         
         
-    def shuffle_players(self) -> None:
+    def __shuffle_players(self) -> None:
         shuffle(self.players)
     
 
-    #DEBUG FUNCTIONS
-    def print_map(self) -> None:
-        for territory in self.map:
-            print(f"{territory["name"]} of {territory["owner"].name} occupied by {territory["troops"]} troops")
 

@@ -4,4 +4,4 @@ class Player:
         self.goal = goal
 
     def __str__(self):
-        return f"Name: {self.name}, Goal: {self.goal}"
+        return f"{self.name} wins if {self.goal}"
