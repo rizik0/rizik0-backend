@@ -73,8 +73,8 @@ class Game:
             while territories_assigned < max_territories:
                 random_num = randint(0, len(self.map)-1)
                 if self.map[random_num]["owner"] == None:
-                    self.map[random_num]["owner"] = player.name
-                    self.map[random_num]["troops"] = 1 #non sono sicuro ricontrollare
+                    self.map[random_num]["owner"] = player
+                    self.map[random_num]["troops"] = 1 
                     territories_assigned += 1
         pass
 
