@@ -65,7 +65,17 @@ class Game:
         self.shuffle_players()
 
     
-    def assing_map_randomly(self) -> None:
+    def assigning_map_randomly(self) -> None:
+        for player in self.players:
+            territories_assigned = 0
+            num_territories = 14 #trasformare in costante
+
+            while territories_assigned < num_territories:
+                random_num = randint(0, len(self.map)-1)
+                if self.map[random_num]["owner"] == None:
+                    self.map[random_num]["owner"] = player.name
+                    self.map[random_num]["troops"] = 1 #non sono sicuro ricontrollare
+                    territories_assigned += 1
         pass
 
 
