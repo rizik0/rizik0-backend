@@ -74,17 +74,97 @@ class Game:
             for player in self.players:
                 print(f"Player: {player.name} turn {turn}")
 
+                # Phase 1: Receiving troops
                 receiving_troops = int(self.__from_player_receive_number_of_territories(player)/3)
 
                 if (turn != 0 and turn % 3 == 0):
                     receiving_troops += randint(8, 12) # BONUS!
 
-                # sending number of troops to client player
                 print("Player: ", player.name, " received ", receiving_troops, " troops")
-                # receiving map from client player
-                input()
-                # updating map
-                # sending updated map to client player
+
+                # Phase 2: Assigning troops    
+                while receiving_troops > 0:
+                    territory = input("Choose a territory to send troops: ")
+                    if self.__is_territory_owned_by_player(territory, player):
+                        self.map[self.__from_territory_name_get_territory_index(territory)]["troops"] += 1
+                        receiving_troops -= 1
+                    else:
+                        print("This is not yours...")
+                
+
+                # Phase 3: Attacking
+                while True:
+                    while True:
+                        attacking_territory = input("Choose a territory to attack from: ")
+                        if self.__is_territory_owned_by_player(attacking_territory, player):
+                            break
+                        print("This is not yours...")
+
+                    while True:
+                        defending_territory = input("Choose a territory to attack: ")
+                        if not self.__is_territory_owned_by_player(defending_territory, player):
+                            break
+                        print("You can't attack yourself...")
+                        if defending_territory in self.map[self.__from_territory_name_get_territory_index(attacking_territory)]["neighbours"]:
+                            break
+                        print("You can't attack a territory that is not a neighbour...")
+                    
+                    print("Attacking ", defending_territory, " from ", attacking_territory)
+
+                    attacking_troops = int(input("How many troops are you sending? "))
+                    if attacking_troops > 3:
+                        print("You can't send more than 3 troops...")
+                        attacking_troops = 3
+                    elif attacking_troops < 1:
+                        print("You can't send less than 1 troop...")
+                        attacking_troops = 1
+                    
+                    defending_troops = self.map[self.__from_territory_name_get_territory_index(defending_territory)]["troops"]
+                    if defending_troops > 3:
+                        defending_troops = 3
+                    
+                    attacking_dice = []
+                    for i in range(attacking_troops):
+                        attacking_dice.append(randint(1, 6))
+                        attacking_dice.sort(reverse=True)
+
+                    defending_dice = []
+                    for i in range(defending_troops):
+                        defending_dice.append(randint(1, 6))
+                        defending_dice.sort(reverse=True)
+
+                    attacking_losses = 0
+                    defending_losses = 0
+
+                    for i in range(min(attacking_troops, defending_troops)):
+                        if attacking_dice[i] > defending_dice[i]:
+                            defending_losses += 1
+                        else:
+                            attacking_losses += 1
+                    
+                    print("Attacking losses: ", attacking_losses)
+                    print("Defending losses: ", defending_losses)
+
+                    self.map[self.__from_territory_name_get_territory_index(attacking_territory)]["troops"] -= attacking_losses
+                    self.map[self.__from_territory_name_get_territory_index(defending_territory)]["troops"] -= defending_losses
+
+                    if self.map[self.__from_territory_name_get_territory_index(defending_territory)]["troops"] == 0:
+                        print("You won the territory!")
+                        self.map[self.__from_territory_name_get_territory_index(defending_territory)]["owner"] = player
+                        self.map[self.__from_territory_name_get_territory_index(defending_territory)]["troops"] = attacking_troops
+                        self.map[self.__from_territory_name_get_territory_index(attacking_territory)]["troops"] -= attacking_troops
+
+                    print(self)
+
+                    if input("Do you want to attack again? (y/n) ") == "n":
+                        break
+
+
+                # Phase 4: Moving troops
+                print(player.name + " has finished his turn")
+
+                print("--------- UPDATED MAP ---------")
+                print(self)
 
             turn += 1
             
@@ -121,6 +201,18 @@ class Game:
             if territory["owner"] == player:
                 territories += 1
         return territories
+    
+    def __is_territory_owned_by_player(self, territory_name: str, player: Player) -> bool:
+        for territory in self.map:
+            if territory["name"] == territory_name and territory["owner"] == player:
+                return True
+        return False
+
+    def __from_territory_name_get_territory_index(self, territory_name: str) -> int:
+        for i in range(len(self.map)):
+            if self.map[i]["name"] == territory_name:
+                return i
+        return -1
 
     def __add_player(self, player: str) -> None:
         self.players.append(Player(player, self.possible_goals.pop(randint(0, len(self.possible_goals)-1))))
