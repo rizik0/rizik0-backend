@@ -61,7 +61,7 @@ class Game:
             ret += str(player) + "\n"
         ret += "Map:\n"
         for territory in self.map:
-            ret += f"{territory["name"]} of {territory["owner"].name} occupied by {territory["troops"]} troops\n"
+            ret += f'{territory["name"]} of {territory["owner"].name} occupied by {territory["troops"]} troops\n'
 
         return ret
 
