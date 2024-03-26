@@ -6,52 +6,52 @@ class Game:
 
     def __init__(self) -> None:
         self.game_id = str(uuid.uuid4())
-        self.possible_goals = ["Conquere North America", "Conquere South America", "Conquere Europe", "Conquere Africa", "Conquere Asia", "Conquere Oceania"]
+        self.possible_goals = ["Conquer North America", "Conquer South America", "Conquer Europe", "Conquer Africa", "Conquer Asia", "Conquer Oceania"]
         self.players = []
         self.status = "Waiting for players to join..."
         self.map = [
-            {"name": "alaska", "troups": 0, "owner": None, "continent": "north-america", "neibourghs": []},
-            {"name": "northwest_territory", "troups": 0, "owner": None, "continent": "north-america", "neibourghs": []},
-            {"name": "alberta", "troups": 0, "owner": None, "continent": "north-america", "neibourghs": []},
-            {"name": "ontario", "troups": 0, "owner": None, "continent": "north-america", "neibourghs": []},
-            {"name": "greenland", "troups": 0, "owner": None, "continent": "north-america", "neibourghs": []},
-            {"name": "quebec", "troups": 0, "owner": None, "continent": "north-america", "neibourghs": []},
-            {"name": "western_united_states", "troups": 0, "owner": None, "continent": "north-america", "neibourghs": []},
-            {"name": "eastern_united_states", "troups": 0, "owner": None, "continent": "north-america", "neibourghs": []},
-            {"name": "central_america", "troups": 0, "owner": None, "continent": "north-america", "neibourghs": []},
-            {"name": "venezuela", "troups": 0, "owner": None, "continent": "south-america", "neibourghs": []},
-            {"name": "peru", "troups": 0, "owner": None, "continent": "south-america", "neibourghs": []},
-            {"name": "brazil", "troups": 0, "owner": None, "continent": "south-america", "neibourghs": []},
-            {"name": "argentina", "troups": 0, "owner": None, "continent": "south-america", "neibourghs": []},
-            {"name": "iceland", "troups": 0, "owner": None, "continent": "europe", "neibourghs": []},
-            {"name": "scandinavia", "troups": 0, "owner": None, "continent": "europe", "neibourghs": []},
-            {"name": "ukraine", "troups": 0, "owner": None, "continent": "europe", "neibourghs": []},
-            {"name": "great_britain", "troups": 0, "owner": None, "continent": "europe", "neibourghs": []},
-            {"name": "northern_europe", "troups": 0, "owner": None, "continent": "europe", "neibourghs": []},
-            {"name": "western_europe", "troups": 0, "owner": None, "continent": "europe", "neibourghs": []},
-            {"name": "southern_europe", "troups": 0, "owner": None, "continent": "europe", "neibourghs": []},
-            {"name": "north_africa", "troups": 0, "owner": None, "continent": "africa", "neibourghs": []},
-            {"name": "egypt", "troups": 0, "owner": None, "continent": "africa", "neibourghs": []},
-            {"name": "east_africa", "troups": 0, "owner": None, "continent": "africa", "neibourghs": []},
-            {"name": "congo", "troups": 0, "owner": None, "continent": "africa", "neibourghs": []},
-            {"name": "south_africa", "troups": 0, "owner": None, "continent": "africa", "neibourghs": []},
-            {"name": "madagascar", "troups": 0, "owner": None, "continent": "africa", "neibourghs": []},
-            {"name": "ural", "troups": 0, "owner": None, "continent": "asia", "neibourghs": []},
-            {"name": "siberia", "troups": 0, "owner": None, "continent": "asia", "neibourghs": []},
-            {"name": "yakutsk", "troups": 0, "owner": None, "continent": "asia", "neibourghs": []},
-            {"name": "kamchatka", "troups": 0, "owner": None, "continent": "asia", "neibourghs": []},
-            {"name": "irkutsk", "troups": 0, "owner": None, "continent": "asia", "neibourghs": []},
-            {"name": "mongolia", "troups": 0, "owner": None, "continent": "asia", "neibourghs": []},
-            {"name": "china", "troups": 0, "owner": None, "continent": "asia", "neibourghs": []},
-            {"name": "afghanistan", "troups": 0, "owner": None, "continent": "asia", "neibourghs": []},
-            {"name": "middle_east", "troups": 0, "owner": None, "continent": "asia", "neibourghs": []},
-            {"name": "india", "troups": 0, "owner": None, "continent": "asia", "neibourghs": []},
-            {"name": "siam", "troups": 0, "owner": None, "continent": "asia", "neibourghs": []},
-            {"name": "japan", "troups": 0, "owner": None, "continent": "asia", "neibourghs": []},
-            {"name": "indonesia", "troups": 0, "owner": None, "continent": "oceania", "neibourghs": []},
-            {"name": "new_guinea", "troups": 0, "owner": None, "continent": "oceania", "neibourghs": []},
-            {"name": "western_australia", "troups": 0, "owner": None, "continent": "oceania", "neibourghs": []},
-            {"name": "eastern_australia", "troups": 0, "owner": None, "continent": "oceania", "neibourghs": []}
+            {"name": "alaska", "troops": 0, "owner": None, "continent": "north-america", "neighbours": []},
+            {"name": "northwest_territory", "troops": 0, "owner": None, "continent": "north-america", "neighbours": []},
+            {"name": "alberta", "troops": 0, "owner": None, "continent": "north-america", "neighbours": []},
+            {"name": "ontario", "troops": 0, "owner": None, "continent": "north-america", "neighbours": []},
+            {"name": "greenland", "troops": 0, "owner": None, "continent": "north-america", "neighbours": []},
+            {"name": "quebec", "troops": 0, "owner": None, "continent": "north-america", "neighbours": []},
+            {"name": "western_united_states", "troops": 0, "owner": None, "continent": "north-america", "neighbours": []},
+            {"name": "eastern_united_states", "troops": 0, "owner": None, "continent": "north-america", "neighbours": []},
+            {"name": "central_america", "troops": 0, "owner": None, "continent": "north-america", "neighbours": []},
+            {"name": "venezuela", "troops": 0, "owner": None, "continent": "south-america", "neighbours": []},
+            {"name": "peru", "troops": 0, "owner": None, "continent": "south-america", "neighbours": []},
+            {"name": "brazil", "troops": 0, "owner": None, "continent": "south-america", "neighbours": []},
+            {"name": "argentina", "troops": 0, "owner": None, "continent": "south-america", "neighbours": []},
+            {"name": "iceland", "troops": 0, "owner": None, "continent": "europe", "neighbours": []},
+            {"name": "scandinavia", "troops": 0, "owner": None, "continent": "europe", "neighbours": []},
+            {"name": "ukraine", "troops": 0, "owner": None, "continent": "europe", "neighbours": []},
+            {"name": "great_britain", "troops": 0, "owner": None, "continent": "europe", "neighbours": []},
+            {"name": "northern_europe", "troops": 0, "owner": None, "continent": "europe", "neighbours": []},
+            {"name": "western_europe", "troops": 0, "owner": None, "continent": "europe", "neighbours": []},
+            {"name": "southern_europe", "troops": 0, "owner": None, "continent": "europe", "neighbours": []},
+            {"name": "north_africa", "troops": 0, "owner": None, "continent": "africa", "neighbours": []},
+            {"name": "egypt", "troops": 0, "owner": None, "continent": "africa", "neighbours": []},
+            {"name": "east_africa", "troops": 0, "owner": None, "continent": "africa", "neighbours": []},
+            {"name": "congo", "troops": 0, "owner": None, "continent": "africa", "neighbours": []},
+            {"name": "south_africa", "troops": 0, "owner": None, "continent": "africa", "neighbours": []},
+            {"name": "madagascar", "troops": 0, "owner": None, "continent": "africa", "neighbours": []},
+            {"name": "ural", "troops": 0, "owner": None, "continent": "asia", "neighbours": []},
+            {"name": "siberia", "troops": 0, "owner": None, "continent": "asia", "neighbours": []},
+            {"name": "yakutsk", "troops": 0, "owner": None, "continent": "asia", "neighbours": []},
+            {"name": "kamchatka", "troops": 0, "owner": None, "continent": "asia", "neighbours": []},
+            {"name": "irkutsk", "troops": 0, "owner": None, "continent": "asia", "neighbours": []},
+            {"name": "mongolia", "troops": 0, "owner": None, "continent": "asia", "neighbours": []},
+            {"name": "china", "troops": 0, "owner": None, "continent": "asia", "neighbours": []},
+            {"name": "afghanistan", "troops": 0, "owner": None, "continent": "asia", "neighbours": []},
+            {"name": "middle_east", "troops": 0, "owner": None, "continent": "asia", "neighbours": []},
+            {"name": "india", "troops": 0, "owner": None, "continent": "asia", "neighbours": []},
+            {"name": "siam", "troops": 0, "owner": None, "continent": "asia", "neighbours": []},
+            {"name": "japan", "troops": 0, "owner": None, "continent": "asia", "neighbours": []},
+            {"name": "indonesia", "troops": 0, "owner": None, "continent": "oceania", "neighbours": []},
+            {"name": "new_guinea", "troops": 0, "owner": None, "continent": "oceania", "neighbours": []},
+            {"name": "western_australia", "troops": 0, "owner": None, "continent": "oceania", "neighbours": []},
+            {"name": "eastern_australia", "troops": 0, "owner": None, "continent": "oceania", "neighbours": []}
         ]
 
         
@@ -65,7 +65,17 @@ class Game:
         self.shuffle_players()
 
     
-    def assing_map_randomly(self) -> None:
+    def assigning_map_randomly(self) -> None:
+        for player in self.players:
+            territories_assigned = 0
+            max_territories = 14 #trasformare in costante
+
+            while territories_assigned < max_territories:
+                random_num = randint(0, len(self.map)-1)
+                if self.map[random_num]["owner"] == None:
+                    self.map[random_num]["owner"] = player
+                    self.map[random_num]["troops"] = 1 
+                    territories_assigned += 1
         pass
 
 
@@ -77,4 +87,11 @@ class Game:
         shuffle(self.players)
     
 
-    
+    #DEBUG FUNCTIONS
+    def print_map(self) -> None:
+        for territory in self.map:
+            print(territory["name"])
+            print(territory["owner"])
+            print("\n") 
+
+
