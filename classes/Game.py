@@ -87,4 +87,11 @@ class Game:
         shuffle(self.players)
     
 
-    
+    #DEBUG FUNCTIONS
+    def print_map(self) -> None:
+        for territory in self.map:
+            print(territory["name"])
+            print(territory["owner"])
+            print("\n") 
+
+
