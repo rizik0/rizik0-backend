@@ -70,17 +70,23 @@ class Game:
         self.status = "Game is running..."
         
         turn = 0
+        while True:
+            for player in self.players:
+                print(f"Player: {player.name} turn {turn}")
 
-        for player in self.players:
-            receiving_troops = int(self.__from_player_receive_number_of_territories(player)/3)
+                receiving_troops = int(self.__from_player_receive_number_of_territories(player)/3)
 
-            if (int (turn/3) % 3 == 0):
-                receiving_troops += randint(8, 12) # BONUS!
+                if (turn != 0 and turn % 3 == 0):
+                    receiving_troops += randint(8, 12) # BONUS!
 
-            # sending number of troops to client player
-            # receiving map from client player
-            # updating map
-            # sending updated map to client player
+                # sending number of troops to client player
+                print("Player: ", player.name, " received ", receiving_troops, " troops")
+                # receiving map from client player
+                input()
+                # updating map
+                # sending updated map to client player
+
+            turn += 1
             
 
         

@@ -15,3 +15,5 @@ updated_map[0]["troops"] = 10
 game.initial_troops_assignment(updated_map[0:1])
 print("--------- UPDATED MAP ---------")
 print(game)
+
+game.match()
