@@ -6,7 +6,7 @@ class Game:
 
     def __init__(self) -> None:
         self.game_id = str(uuid.uuid4())
-        self.possible_goals = ["Conquere North America", "Conquere South America", "Conquere Europe", "Conquere Africa", "Conquere Asia", "Conquere Oceania"]
+        self.possible_goals = ["Conquer North America", "Conquer South America", "Conquer Europe", "Conquer Africa", "Conquer Asia", "Conquer Oceania"]
         self.players = []
         self.status = "Waiting for players to join..."
         self.map = [
