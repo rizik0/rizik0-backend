@@ -76,7 +76,10 @@ class Game:
                     self.map[random_num]["owner"] = player
                     self.map[random_num]["troops"] = 1 
                     territories_assigned += 1
-        pass
+    
+    def initial_troops_assignment(self, updated_map) -> None:
+        for updated_territory in updated_map:
+            self.map[self.map.index(updated_territory)]["troops"] = updated_territory["troops"]
 
 
     def add_player(self, player: str) -> None:
@@ -90,8 +93,5 @@ class Game:
     #DEBUG FUNCTIONS
     def print_map(self) -> None:
         for territory in self.map:
-            print(territory["name"])
-            print(territory["owner"])
-            print("\n") 
-
+            print(f"{territory["name"]} of {territory["owner"].name} occupied by {territory["troops"]} troops")
 
