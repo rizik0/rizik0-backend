@@ -6,7 +6,7 @@ class Game:
 
     def __init__(self) -> None:
         self.game_id = str(uuid.uuid4())
-        self.possible_goals = ["Conquer North America", "Conquer South America", "Conquer Europe", "Conquer Africa", "Conquer Asia", "Conquer Oceania"]
+        self.possible_goals = ["north-america", "south-america", "europe", "africa", "asia", "oceania"]
         self.players = []
         self.status = "Waiting for players to join..."
         self.map = [
@@ -112,7 +112,10 @@ class Game:
                     print("Attacking ", defending_territory, " from ", attacking_territory)
 
                     attacking_troops = int(input("How many troops are you sending? "))
-                    if attacking_troops > 3:
+                    if attacking_troops > self.map[self.__from_territory_name_get_territory_index(attacking_territory)]["troops"] - 1:
+                        print("You can't send more troops than you have...")
+                        attacking_troops = self.map[self.__from_territory_name_get_territory_index(attacking_territory)]["troops"] - 1
+                    elif attacking_troops > 3:
                         print("You can't send more than 3 troops...")
                         attacking_troops = 3
                     elif attacking_troops < 1:
@@ -156,11 +159,38 @@ class Game:
 
                     print(self)
 
+                    if self.__has_anyone_won() != None:
+                        print("Player " + self.__has_anyone_won().name + " has won the game!")
+                        break
+
                     if input("Do you want to attack again? (y/n) ") == "n":
                         break
 
 
                 # Phase 4: Moving troops
+                while True:
+                    from_territory = input("Choose a territory to move troops from: ")
+                    if self.__is_territory_owned_by_player(from_territory, player):
+                        break
+                    print("This is not yours...")
+                
+                while True:
+                    to_territory = input("Choose a territory to move troops to: ")
+                    if self.__is_territory_owned_by_player(to_territory, player):
+                        break
+                    print("This is not yours...")
+                
+                troops_to_move = int(input("How many troops do you want to move? "))
+                if troops_to_move > self.map[self.__from_territory_name_get_territory_index(from_territory)]["troops"] - 1:
+                    print("You can't move more troops than you have...")
+                    troops_to_move = self.map[self.__from_territory_name_get_territory_index(from_territory)]["troops"] - 1
+                elif troops_to_move < 1:
+                    print("You can't move less than 1 troop...")
+                    troops_to_move = 1
+
+                self.map[self.__from_territory_name_get_territory_index(from_territory)]["troops"] -= troops_to_move
+                self.map[self.__from_territory_name_get_territory_index(to_territory)]["troops"] += troops_to_move
+
                 print(player.name + " has finished his turn")
 
                 print("--------- UPDATED MAP ---------")
@@ -194,6 +224,32 @@ class Game:
     def initial_troops_assignment(self, updated_map) -> None:
         for updated_territory in updated_map:
             self.map[self.map.index(updated_territory)]["troops"] = updated_territory["troops"]
+
+    def __has_anyone_won(self) -> Player:
+        for player in self.players:
+            if self.__has_a_full_continent(player, player.goal):
+                return player
+        return None
+
+
+    def __has_a_full_continent(self, player: Player, continent: str) -> bool:
+        territories = 0
+        for territory in self.map:
+            if territory["owner"] == player and territory["continent"] == continent:
+                territories += 1
+        if continent == "north-america" and territories == 9:
+            return True
+        elif continent == "south-america" and territories == 4:
+            return True
+        elif continent == "europe" and territories == 7:
+            return True
+        elif continent == "africa" and territories == 6:
+            return True
+        elif continent == "asia" and territories == 12:
+            return True
+        elif continent == "oceania" and territories == 4:
+            return True
+        return False
 
     def __from_player_receive_number_of_territories(self, player: Player) -> int:
         territories = 0
