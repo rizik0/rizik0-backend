@@ -27,7 +27,10 @@ def join_game():
     game_id = post['game_id']
     player_id = post['player_id']
 
-    g = [g for g in games if g.game_id == game_id][0]
+    try:
+        g = [g for g in games if g.game_id == game_id][0]
+    except:
+        return jsonify({'error': 'Game does not exist'})
 
     if g is None:
         return jsonify({'error': 'Game not found'})
@@ -42,9 +45,21 @@ def join_game():
     if len(g.players) == 2:
         return jsonify({'message': 'joined game, waiting for more players'})        
     if len(g.players) == 3:
-        # Start game
-        pass
+        g.status = 'playing'
+        return jsonify({'message': 'game full, starting game'})
+
     return jsonify({'game_id': g.game_id})
+
+
+@app.route('/api/game/<game_id>/status', methods=['GET'])
+def game_status(game_id):
+    g = [g for g in games if g.game_id == game_id][0]
+
+    if g is None:
+        return jsonify({'error': 'Game not found'})
+
+    return jsonify({'status': g.status})
+
 
 if __name__ == '__main__':
     app.run("localhost", 8080, debug=True)
