@@ -204,10 +204,10 @@ class Game:
         return f"Game ID: {self.game_id}\nPlayers: {self.players}" 
 
     def join_players(self, player1: str, player2: str, player3: str) -> None:
-        self.__add_player(player1)
-        self.__add_player(player2)
-        self.__add_player(player3)
-        self.__shuffle_players()
+        self.add_player(player1)
+        self.add_player(player2)
+        self.add_player(player3)
+        self.shuffle_players()
 
     def assigning_map_randomly(self) -> None:
         for player in self.players:
@@ -270,11 +270,11 @@ class Game:
                 return i
         return -1
 
-    def __add_player(self, player: str) -> None:
+    def add_player(self, player: str) -> None:
         self.players.append(Player(player, self.possible_goals.pop(randint(0, len(self.possible_goals)-1))))
         
         
-    def __shuffle_players(self) -> None:
+    def shuffle_players(self) -> None:
         shuffle(self.players)
     
 
