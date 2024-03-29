@@ -45,7 +45,8 @@ def join_game():
     if len(g.players) == 2:
         return jsonify({'message': 'joined game, waiting for more players'})        
     if len(g.players) == 3:
-        g.status = 'playing'
+        g.shuffle_players()
+        g.status = g.players[0].name
         g.assigning_map_randomly()
         return jsonify({'message': 'game full, starting game'})
 

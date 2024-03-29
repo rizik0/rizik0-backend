@@ -8,7 +8,7 @@ class Game:
         self.game_id = str(uuid.uuid4())
         self.possible_goals = ["north-america", "south-america", "europe", "africa", "asia", "oceania"]
         self.players = []
-        self.status = "Waiting for players to join..."
+        self.status = "waiting"
         self.map = [
             {"name": "alaska", "troops": 0, "owner": None, "continent": "north-america", "neighbours": ["northwest_territory", "alberta", "kamchatka"]},
             {"name": "northwest_territory", "troops": 0, "owner": None, "continent": "north-america", "neighbours": ["alaska", "alberta", "ontario", "greenland"]},
@@ -199,9 +199,6 @@ class Game:
             turn += 1
             
 
-        
-    def current_game_status(self) -> str:
-        return f"Game ID: {self.game_id}\nPlayers: {self.players}" 
 
     def join_players(self, player1: str, player2: str, player3: str) -> None:
         self.add_player(player1)
