@@ -5,7 +5,7 @@ import uuid
 class Game:
 
     def __init__(self) -> None:
-        self.game_id = str(uuid.uuid4())
+        self.game_id = str(uuid.uuid4()).split('-')[0]
         self.possible_goals = ["north-america", "south-america", "europe", "africa", "asia", "oceania"]
         self.players = []
         self.status = "waiting"
@@ -53,7 +53,7 @@ class Game:
             {"name": "western_australia", "troops": 0, "owner": None, "continent": "oceania", "neighbours": ["indonesia", "new_guinea", "eastern_australia"]},
             {"name": "eastern_australia", "troops": 0, "owner": None, "continent": "oceania", "neighbours": ["new_guinea", "western_australia"]}
         ]
-
+        self.turn = 0
     
     def __str__(self) -> None:
         ret = "Players:\n"
@@ -66,19 +66,17 @@ class Game:
         return ret
 
 
-    def match(self) -> None:
-        self.status = "Game is running..."
-        
+    def match(self) -> None:        
         turn = 0
         while True:
             for player in self.players:
                 print(f"Player: {player.name} turn {turn}")
 
                 # Phase 1: Receiving troops
-                receiving_troops = int(self.__from_player_receive_number_of_territories(player)/3)
+                receiving_troops = int(self.from_player_receive_number_of_territories(player)/3)  # DONE
 
                 if (turn != 0 and turn % 3 == 0):
-                    receiving_troops += randint(8, 12) # BONUS!
+                    receiving_troops += randint(8, 12) # BONUS! # DONE
 
                 print("Player: ", player.name, " received ", receiving_troops, " troops")
 
@@ -214,7 +212,7 @@ class Game:
             while territories_assigned < max_territories:
                 random_num = randint(0, len(self.map)-1)
                 if self.map[random_num]["owner"] == None:
-                    self.map[random_num]["owner"] = player
+                    self.map[random_num]["owner"] = player.name
                     self.map[random_num]["troops"] = 1 
                     territories_assigned += 1
     
@@ -248,7 +246,7 @@ class Game:
             return True
         return False
 
-    def __from_player_receive_number_of_territories(self, player: Player) -> int:
+    def from_player_receive_number_of_territories(self, player: str) -> int:
         territories = 0
         for territory in self.map:
             if territory["owner"] == player:
