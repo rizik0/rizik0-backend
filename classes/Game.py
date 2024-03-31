@@ -204,6 +204,25 @@ class Game:
         self.add_player(player3)
         self.shuffle_players()
 
+    def avoid_easy_win(self, player: Player, this_continent: str, next_territory: str) -> bool:
+        territories = 0
+        for territory in self.maps:
+            if territory["owner"] == player and territory["continent"] == this_continent:
+                territories += 1
+        if this_continent == "north-america" and territories == 8:
+            return False
+        elif this_continent == "south-america" and territories == 3:
+            return False
+        elif this_continent == "europe" and territories == 6:
+            return False
+        elif this_continent == "africa" and territories == 5:
+            return False
+        elif this_continent == "asia" and territories == 11:
+            return False
+        elif this_continent == "oceania" and territories == 3:
+            return False
+        return True
+
     def assigning_maps_randomly(self) -> None:
         for player in self.players:
             territories_assigned = 0
@@ -212,10 +231,11 @@ class Game:
             while territories_assigned < max_territories:
                 random_num = randint(0, len(self.maps)-1)
                 if self.maps[random_num]["owner"] == None:
-                    self.maps[random_num]["owner"] = player.name
-                    self.maps[random_num]["color"] = player.color
-                    self.maps[random_num]["troops"] = 1 
-                    territories_assigned += 1
+                    if self.avoid_easy_win(player, self.maps[random_num]["continent"], self.maps[random_num]["name"]):
+                        self.maps[random_num]["owner"] = player.name
+                        self.maps[random_num]["color"] = player.color
+                        self.maps[random_num]["troops"] = 1 
+                        territories_assigned += 1
     
     def initial_troops_assignment(self, updated_maps) -> None:
         for updated_territory in updated_maps:
