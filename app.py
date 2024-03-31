@@ -74,7 +74,7 @@ def game_players(game_id):
     
     g = g[0]
     
-    names = [p.name for p in g.players]
+    names = [{"name": p.name, "color": p.color} for p in g.players]
 
     return jsonify({'players': names})
 
