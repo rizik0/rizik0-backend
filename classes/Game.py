@@ -9,6 +9,7 @@ class Game:
         self.possible_goals = ["north-america", "south-america", "europe", "africa", "asia", "oceania"]
         self.players = []
         self.status = "waiting"
+        self.turn_status = "initial"
         self.maps = [
             {"name": "alaska", "troops": 0, "owner": None, "continent": "north-america", "neighbours": ["northwest_territory", "alberta", "kamchatka"], "color": None},
             {"name": "northwest_territory", "troops": 0, "owner": None, "continent": "north-america", "neighbours": ["alaska", "alberta", "ontario", "greenland"], "color": None},
