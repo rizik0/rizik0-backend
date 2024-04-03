@@ -13,6 +13,7 @@ CORS(app)
 def api():
     return jsonify({'data': 'Hello, World!'})
 
+# Definitive
 @app.route('/api/game/create', methods=['POST'])
 def create_game():
     post = request.get_json()
@@ -23,6 +24,7 @@ def create_game():
     g.add_player(creator, 'red')
     return jsonify({'game_id': g.game_id})
 
+# Definitive
 @app.route('/api/game/join', methods=['POST'])
 def join_game():
     post = request.get_json()
@@ -55,7 +57,7 @@ def join_game():
 
 
 @app.route('/api/game/<game_id>/status', methods=['GET'])
-def game_status(game_id):
+def game_status(game_id):    
     g = [g for g in games if g.game_id == game_id]
     
     if g == []:
@@ -63,8 +65,9 @@ def game_status(game_id):
     
     g = g[0]
 
-    return jsonify({'status': g.status})
+    return jsonify({'maps': g.maps, 'status': g.status, 'turn': g.turn, 'phase': g.turn_status, 'players': [{'name': p.name, 'color': p.color} for p in g.players]})
 
+# Temporary
 @app.route('/api/game/<game_id>/players', methods=['GET'])
 def game_players(game_id):
     g = [g for g in games if g.game_id == game_id]
@@ -78,8 +81,12 @@ def game_players(game_id):
 
     return jsonify({'players': names})
 
-@app.route('/api/game/<game_id>/maps', methods=['GET'])
-def game_maps(game_id):
+
+@app.route('/api/game/<game_id>/play/initial/get', methods=['GET'])
+def game_play_initial_get(game_id):
+    get = request.get_json()
+    player_id = get['player_id']
+
     g = [g for g in games if g.game_id == game_id]
     
     if g == []:
@@ -87,98 +94,17 @@ def game_maps(game_id):
     
     g = g[0]
 
-    return jsonify({'maps': g.maps})
-
-
-@app.route('/api/game/<game_id>/troops/first', methods=['GET'])
-def troops_first(game_id):
-    post = request.get_json()
-    player_id = post['player_id']
-    g = [g for g in games if g.game_id == game_id]
+    if g.turn_status != 'initial':
+        return jsonify({'error': 'Not in initial phase'})
     
-    if g == []:
-        return jsonify({'error': 'Game not found'})
-    
-    g = g[0]
+    p = [p for p in g.players if p.name == player_id]
 
-    if player_id != g.status:
-        return jsonify({'error': 'Not your turn'})
-    
-    return jsonify({'troops': 21})
+    if p == []:
+        return jsonify({'error': 'Player not found'})
 
-@app.route('/api/game/<game_id>/turn_status', methods=['GET'])
-def turn_status(game_id):
-    g = [g for g in games if g.game_id == game_id]
-    
-    if g == []:
-        return jsonify({'error': 'Game not found'})
-    
-    g = g[0]
+    p = p[0]
 
-    return jsonify({'turn_status': g.turn_status})
-
-@app.route('/api/game/<game_id>/troops/first/assignment', methods=['POST'])
-def troops_first_assignment(game_id):
-    post = request.get_json()
-    player_id = post['player_id']
-    g = [g for g in games if g.game_id == game_id]
-    
-    if g == []:
-        return jsonify({'error': 'Game not found'})
-    
-    g = g[0]
-
-    if player_id != g.status:
-        return jsonify({'error': 'Not your turn'})
-    
-    g.maps = post['maps']
-    g.turn += 1
-    g.status = g.players[g.turn%3].name
-    return jsonify({'status': 'ok'})
-
-
-@app.route('/api/game/<game_id>/troops/available', methods=['GET'])
-def troops_available(game_id):
-    post = request.get_json()
-    player_id = post['player_id']
-    g = [g for g in games if g.game_id == game_id]
-    
-    if g == []:
-        return jsonify({'error': 'Game not found'})
-    
-    g = g[0]
-
-    if player_id != g.status:
-        return jsonify({'error': 'Not your turn'})
-    
-    available_troops = int(g.from_player_receive_number_of_territories(player_id)/3)
-
-    if (g.turn != 0 and g.turn % 3 == 0):
-        available_troops += randint(8, 12) # BONUS!
-
-    return jsonify({'troops': available_troops})
-
-
-@app.route('/api/game/<game_id>/troops/place', methods=['POST'])
-def troops_place(game_id):
-    post = request.get_json()
-    player_id = post['player_id']
-    g = [g for g in games if g.game_id == game_id]
-    
-    if g == []:
-        return jsonify({'error': 'Game not found'})
-    
-    g = g[0]
-
-    player = [p for p in g.players if p.name == player_id][0]
-
-    if player.name != g.status:
-        return jsonify({'error': 'Not your turn'})
-
-    
-    g.maps = post['maps']
-
-    return jsonify({'message': 'Troops placed'})
+    return jsonify({'troops': p.initial_units})
 
 
 if __name__ == '__main__':
