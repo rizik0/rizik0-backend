@@ -82,10 +82,10 @@ def game_players(game_id):
     return jsonify({'players': names})
 
 
-@app.route('/api/game/<game_id>/play/initial/get', methods=['GET'])
+@app.route('/api/game/<game_id>/play/initial/get', methods=['POST'])
 def game_play_initial_get(game_id):
-    get = request.get_json()
-    player_id = get['player_id']
+    post = request.get_json()
+    player_id = post['player_id']
 
     g = [g for g in games if g.game_id == game_id]
     
@@ -103,6 +103,48 @@ def game_play_initial_get(game_id):
         return jsonify({'error': 'Player not found'})
 
     p = p[0]
+
+    return jsonify({'troops': p.initial_units})
+
+@app.route('/api/game/<game_id>/play/initial/place', methods=['POST'])
+def game_play_initial_place(game_id):
+    post = request.get_json()
+    player_id = post['player_id']
+    troops = int(post['troops'])
+    territory = post['territory']
+
+    g = [g for g in games if g.game_id == game_id]
+    
+    if g == []:
+        return jsonify({'error': 'Game not found'})
+    
+    g = g[0]
+
+    if g.turn_status != 'initial':
+        return jsonify({'error': 'Not in initial phase'})
+    
+    p = [p for p in g.players if p.name == player_id]
+
+    if p == []:
+        return jsonify({'error': 'Player not found'})
+
+    p = p[0]
+
+    if p.initial_units < troops:
+        return jsonify({'error': 'Not enough troops'})
+
+    p.initial_units -= troops
+
+    # mettere il territorio g.maps[territory] = player_id
+
+    g.maps[g.from_territory_name_get_territory_index(territory)]['troops'] += troops
+
+    if p.initial_units == 0:
+        if player_id == g.players[2].name:
+            g.status = g.players[0].name
+            g.turn_status = 'positioning'
+        else:
+            g.status = g.players[(g.players.index(p) + 1)].name
 
     return jsonify({'troops': p.initial_units})
 

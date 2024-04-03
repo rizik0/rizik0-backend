@@ -85,7 +85,7 @@ class Game:
                 while receiving_troops > 0:
                     territory = input("Choose a territory to send troops: ")
                     if self.__is_territory_owned_by_player(territory, player):
-                        self.maps[self.__from_territory_name_get_territory_index(territory)]["troops"] += 1
+                        self.maps[self.from_territory_name_get_territory_index(territory)]["troops"] += 1
                         receiving_troops -= 1
                     else:
                         print("This is not yours...")
@@ -104,16 +104,16 @@ class Game:
                         if not self.__is_territory_owned_by_player(defending_territory, player):
                             break
                         print("You can't attack yourself...")
-                        if defending_territory in self.maps[self.__from_territory_name_get_territory_index(attacking_territory)]["neighbours"]:
+                        if defending_territory in self.maps[self.from_territory_name_get_territory_index(attacking_territory)]["neighbours"]:
                             break
                         print("You can't attack a territory that is not a neighbour...")
                     
                     print("Attacking ", defending_territory, " from ", attacking_territory)
 
                     attacking_troops = int(input("How many troops are you sending? "))
-                    if attacking_troops > self.maps[self.__from_territory_name_get_territory_index(attacking_territory)]["troops"] - 1:
+                    if attacking_troops > self.maps[self.from_territory_name_get_territory_index(attacking_territory)]["troops"] - 1:
                         print("You can't send more troops than you have...")
-                        attacking_troops = self.maps[self.__from_territory_name_get_territory_index(attacking_territory)]["troops"] - 1
+                        attacking_troops = self.maps[self.from_territory_name_get_territory_index(attacking_territory)]["troops"] - 1
                     elif attacking_troops > 3:
                         print("You can't send more than 3 troops...")
                         attacking_troops = 3
@@ -121,7 +121,7 @@ class Game:
                         print("You can't send less than 1 troop...")
                         attacking_troops = 1
                     
-                    defending_troops = self.maps[self.__from_territory_name_get_territory_index(defending_territory)]["troops"]
+                    defending_troops = self.maps[self.from_territory_name_get_territory_index(defending_territory)]["troops"]
                     if defending_troops > 3:
                         defending_troops = 3
                     
@@ -147,14 +147,14 @@ class Game:
                     print("Attacking losses: ", attacking_losses)
                     print("Defending losses: ", defending_losses)
 
-                    self.maps[self.__from_territory_name_get_territory_index(attacking_territory)]["troops"] -= attacking_losses
-                    self.maps[self.__from_territory_name_get_territory_index(defending_territory)]["troops"] -= defending_losses
+                    self.maps[self.from_territory_name_get_territory_index(attacking_territory)]["troops"] -= attacking_losses
+                    self.maps[self.from_territory_name_get_territory_index(defending_territory)]["troops"] -= defending_losses
 
-                    if self.maps[self.__from_territory_name_get_territory_index(defending_territory)]["troops"] == 0:
+                    if self.maps[self.from_territory_name_get_territory_index(defending_territory)]["troops"] == 0:
                         print("You won the territory!")
-                        self.maps[self.__from_territory_name_get_territory_index(defending_territory)]["owner"] = player
-                        self.maps[self.__from_territory_name_get_territory_index(defending_territory)]["troops"] = attacking_troops
-                        self.maps[self.__from_territory_name_get_territory_index(attacking_territory)]["troops"] -= attacking_troops
+                        self.maps[self.from_territory_name_get_territory_index(defending_territory)]["owner"] = player
+                        self.maps[self.from_territory_name_get_territory_index(defending_territory)]["troops"] = attacking_troops
+                        self.maps[self.from_territory_name_get_territory_index(attacking_territory)]["troops"] -= attacking_troops
 
                     print(self)
 
@@ -180,15 +180,15 @@ class Game:
                     print("This is not yours...")
                 
                 troops_to_move = int(input("How many troops do you want to move? "))
-                if troops_to_move > self.maps[self.__from_territory_name_get_territory_index(from_territory)]["troops"] - 1:
+                if troops_to_move > self.maps[self.from_territory_name_get_territory_index(from_territory)]["troops"] - 1:
                     print("You can't move more troops than you have...")
-                    troops_to_move = self.maps[self.__from_territory_name_get_territory_index(from_territory)]["troops"] - 1
+                    troops_to_move = self.maps[self.from_territory_name_get_territory_index(from_territory)]["troops"] - 1
                 elif troops_to_move < 1:
                     print("You can't move less than 1 troop...")
                     troops_to_move = 1
 
-                self.maps[self.__from_territory_name_get_territory_index(from_territory)]["troops"] -= troops_to_move
-                self.maps[self.__from_territory_name_get_territory_index(to_territory)]["troops"] += troops_to_move
+                self.maps[self.from_territory_name_get_territory_index(from_territory)]["troops"] -= troops_to_move
+                self.maps[self.from_territory_name_get_territory_index(to_territory)]["troops"] += troops_to_move
 
                 print(player.name + " has finished his turn")
 
@@ -281,7 +281,7 @@ class Game:
                 return True
         return False
 
-    def __from_territory_name_get_territory_index(self, territory_name: str) -> int:
+    def from_territory_name_get_territory_index(self, territory_name: str) -> int:
         for i in range(len(self.maps)):
             if self.maps[i]["name"] == territory_name:
                 return i
