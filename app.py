@@ -228,5 +228,97 @@ def game_play_positioning_place(game_id):
 
     return jsonify({'troops': p.initial_units})
 
+@app.route('/api/game/<game_id>/play/attacking/', methods=['POST'])
+def game_play_attacking(game_id):
+    post = request.get_json()
+    player_id = post['player_id']
+    from_territory = post['from_territory']
+    to_territory = post['to_territory']
+    troops = int(post['troops'])
+
+    g = [g for g in games if g.game_id == game_id]
+    
+    if g == []:
+        return jsonify({'error': 'Game not found'})
+    
+    g = g[0]
+
+    if g.turn_status != 'attacking':
+        return jsonify({'error': 'Not in attacking phase'})
+    
+    p = [p for p in g.players if p.name == player_id]
+
+    if p == []:
+        return jsonify({'error': 'Player not found'})
+
+    p = p[0]
+
+    from_territory_index = g.from_territory_name_get_territory_index(from_territory)
+    to_territory_index = g.from_territory_name_get_territory_index(to_territory)
+
+    if g.maps[from_territory_index]['troops'] + 1 <= troops:
+        return jsonify({'error': 'Not enough troops'})
+
+    if g.maps[from_territory_index]['owner'] != player_id:
+        return jsonify({'error': 'Not your territory'})
+
+    if g.maps[to_territory_index]['owner'] == player_id:
+        return jsonify({'error': 'Cannot attack your own territory'})
+
+    if g.maps[from_territory_index]['neighbours'].count(to_territory) == 0:
+        return jsonify({'error': 'Territories are not neighbours'})
+    
+    if troops > 3:
+        return jsonify({'error': 'Cannot attack with more than 3 troops'})
+    
+    if troops < 1:
+        return jsonify({'error': 'Cannot attack with less than 1 troop'})
+    
+    defending_troops = g.maps[to_territory_index]['troops']
+    attacking_troops = troops
+
+    if defending_troops > 3:
+        defending_troops = 3
+    
+    attacking_dices = []
+    defending_dices = []
+
+    for i in range(attacking_troops):
+        attacking_dices.append(randint(1, 6))
+
+    for i in range(defending_troops):
+        defending_dices.append(randint(1, 6))
+
+    attacking_dices.sort(reverse=True)
+    defending_dices.sort(reverse=True)
+
+    attack_losses = 0
+    defense_losses = 0
+
+    for i in range(min(len(attacking_dices), len(defending_dices))):
+        if attacking_dices[i] > defending_dices[i]:
+            g.maps[to_territory_index]['troops'] -= 1
+            defense_losses += 1
+        else:
+            g.maps[from_territory_index]['troops'] -= 1
+            attack_losses += 1
+
+    # g.maps[to_territory_index]['troops'] -= troops
+
+    # if g.maps[to_territory_index]['troops'] == 0:
+    #     g.maps[to_territory_index]['owner'] = player_id
+    #     g.maps[to_territory_index]['troops'] = troops
+    #     g.maps[from_territory_index]['troops'] -= troops
+    # else:
+    #     g.maps[from_territory_index]['troops'] -= troops
+
+    if g.maps[to_territory_index]['troops'] == 0:
+        g.maps[to_territory_index]['owner'] = player_id
+        g.maps[to_territory_index]['color'] = p.color
+        g.maps[to_territory_index]['troops'] = troops - attack_losses
+        g.maps[from_territory_index]['troops'] -= troops
+
+    return jsonify({'attack_losses': attack_losses, 'defense_losses': defense_losses, 'attacking_dices': attacking_dices, 'defending_dices': defending_dices})
+
 if __name__ == '__main__':
     app.run("localhost", 3000, debug=True)
