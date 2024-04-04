@@ -135,8 +135,6 @@ def game_play_initial_place(game_id):
 
     p.initial_units -= troops
 
-    # mettere il territorio g.maps[territory] = player_id
-
     g.maps[g.from_territory_name_get_territory_index(territory)]['troops'] += troops
 
     if p.initial_units == 0:
@@ -148,6 +146,86 @@ def game_play_initial_place(game_id):
 
     return jsonify({'troops': p.initial_units})
 
+@app.route('/api/game/<game_id>/play/positioning/get', methods=['POST'])
+def game_play_initial_get(game_id):
+    post = request.get_json()
+    player_id = post['player_id']
+
+    g = [g for g in games if g.game_id == game_id]
+    
+    if g == []:
+        return jsonify({'error': 'Game not found'})
+    
+    g = g[0]
+
+    if g.turn_status != 'positioning':
+        return jsonify({'error': 'Not in positioning phase'})
+    
+    p = [p for p in g.players if p.name == player_id]
+
+    if p == []:
+        return jsonify({'error': 'Player not found'})
+
+    p = p[0]
+
+    continent_bonus = 0
+    random_bonus = 0
+
+    if g.has_full_continent(p.name, 'africa'):
+        continent_bonus += 3
+    if g.has_full_continent(p.name, 'asia'):
+        continent_bonus += 7
+    if g.has_full_continent(p.name, 'europe'):
+        continent_bonus += 5
+    if g.has_full_continent(p.name, 'north_america'):
+        continent_bonus += 5
+    if g.has_full_continent(p.name, 'oceania'):
+        continent_bonus += 2
+    if g.has_full_continent(p.name, 'south_america'):
+        continent_bonus += 2
+    
+    if int(g.turn/3) != 0 and int(g.turn/3) % 3 == 0:
+        random_bonus = randint(6, 12)
+    
+    p.initial_units = (g.from_player_receive_number_of_territories(p.name)/3) + continent_bonus + random_bonus
+
+    return jsonify({'troops': p.initial_units})
+
+@app.route('/api/game/<game_id>/play/positioning/place', methods=['POST'])
+def game_play_initial_place(game_id):
+    post = request.get_json()
+    player_id = post['player_id']
+    troops = int(post['troops'])
+    territory = post['territory']
+
+    g = [g for g in games if g.game_id == game_id]
+    
+    if g == []:
+        return jsonify({'error': 'Game not found'})
+    
+    g = g[0]
+
+    if g.turn_status != 'positioning':
+        return jsonify({'error': 'Not in positioning phase'})
+    
+    p = [p for p in g.players if p.name == player_id]
+
+    if p == []:
+        return jsonify({'error': 'Player not found'})
+
+    p = p[0]
+
+    if p.initial_units < troops:
+        return jsonify({'error': 'Not enough troops'})
+
+    p.initial_units -= troops
+
+    g.maps[g.from_territory_name_get_territory_index(territory)]['troops'] += troops
+
+    if p.initial_units == 0:
+        g.turn_status = 'attacking'
+
+    return jsonify({'troops': p.initial_units})
 
 if __name__ == '__main__':
     app.run("localhost", 3000, debug=True)
