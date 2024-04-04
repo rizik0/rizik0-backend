@@ -147,7 +147,7 @@ def game_play_initial_place(game_id):
     return jsonify({'troops': p.initial_units})
 
 @app.route('/api/game/<game_id>/play/positioning/get', methods=['POST'])
-def game_play_initial_get(game_id):
+def game_play_positioning_get(game_id):
     post = request.get_json()
     player_id = post['player_id']
 
@@ -171,28 +171,29 @@ def game_play_initial_get(game_id):
     continent_bonus = 0
     random_bonus = 0
 
-    if g.has_full_continent(p.name, 'africa'):
+    if g.has_a_full_continent(p.name, 'africa'):
         continent_bonus += 3
-    if g.has_full_continent(p.name, 'asia'):
+    if g.has_a_full_continent(p.name, 'asia'):
         continent_bonus += 7
-    if g.has_full_continent(p.name, 'europe'):
+    if g.has_a_full_continent(p.name, 'europe'):
         continent_bonus += 5
-    if g.has_full_continent(p.name, 'north_america'):
+    if g.has_a_full_continent(p.name, 'north_america'):
         continent_bonus += 5
-    if g.has_full_continent(p.name, 'oceania'):
+    if g.has_a_full_continent(p.name, 'oceania'):
         continent_bonus += 2
-    if g.has_full_continent(p.name, 'south_america'):
+    if g.has_a_full_continent(p.name, 'south_america'):
         continent_bonus += 2
     
     if int(g.turn/3) != 0 and int(g.turn/3) % 3 == 0:
         random_bonus = randint(6, 12)
     
-    p.initial_units = (g.from_player_receive_number_of_territories(p.name)/3) + continent_bonus + random_bonus
-
+    if p.initial_units == 0:
+        p.initial_units = int(g.from_player_receive_number_of_territories(p.name)/3) + continent_bonus + random_bonus
+    
     return jsonify({'troops': p.initial_units})
 
 @app.route('/api/game/<game_id>/play/positioning/place', methods=['POST'])
-def game_play_initial_place(game_id):
+def game_play_positioning_place(game_id):
     post = request.get_json()
     player_id = post['player_id']
     troops = int(post['troops'])

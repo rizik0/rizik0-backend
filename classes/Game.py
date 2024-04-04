@@ -244,7 +244,7 @@ class Game:
 
     def __has_anyone_won(self) -> Player:
         for player in self.players:
-            if self.__has_a_full_continent(player, player.goal):
+            if self.has_a_full_continent(player, player.goal):
                 return player
         return None
 
