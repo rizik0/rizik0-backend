@@ -244,12 +244,12 @@ class Game:
 
     def __has_anyone_won(self) -> Player:
         for player in self.players:
-            if self.__has_a_full_continent(player, player.goal):
+            if self.has_a_full_continent(player, player.goal):
                 return player
         return None
 
 
-    def __has_a_full_continent(self, player: Player, continent: str) -> bool:
+    def has_a_full_continent(self, player: str, continent: str) -> bool:
         territories = 0
         for territory in self.maps:
             if territory["owner"] == player and territory["continent"] == continent:
