@@ -205,7 +205,7 @@ class Game:
         self.add_player(player3)
         self.shuffle_players()
 
-    def avoid_easy_win(self, player: Player, this_continent: str, next_territory: str) -> bool:
+    def avoid_easy_win(self, player: str, this_continent: str, next_territory: str) -> bool:
         territories = 0
         for territory in self.maps:
             if territory["owner"] == player and territory["continent"] == this_continent:
@@ -232,7 +232,7 @@ class Game:
             while territories_assigned < max_territories:
                 random_num = randint(0, len(self.maps)-1)
                 if self.maps[random_num]["owner"] == None:
-                    if self.avoid_easy_win(player, self.maps[random_num]["continent"], self.maps[random_num]["name"]):
+                    if self.avoid_easy_win(player.name, self.maps[random_num]["continent"], self.maps[random_num]["name"]):
                         self.maps[random_num]["owner"] = player.name
                         self.maps[random_num]["color"] = player.color
                         self.maps[random_num]["troops"] = 1 
