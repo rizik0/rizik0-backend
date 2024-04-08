@@ -318,7 +318,80 @@ def game_play_attacking(game_id):
         g.maps[to_territory_index]['troops'] = troops - attack_losses
         g.maps[from_territory_index]['troops'] -= troops
 
-    return jsonify({'attack_losses': attack_losses, 'defense_losses': defense_losses, 'attacking_dices': attacking_dices, 'defending_dices': defending_dices})
+        return jsonify({'won': 'yes', 'attack_losses': attack_losses, 'defense_losses': defense_losses, 'attacking_dices': attacking_dices, 'defending_dices': defending_dices})
+
+    return jsonify({'won': 'no', 'attack_losses': attack_losses, 'defense_losses': defense_losses, 'attacking_dices': attacking_dices, 'defending_dices': defending_dices})
+
+@app.route('/api/game/<game_id>/play/attacking/move', methods=['POST'])
+def game_play_attacking_move(game_id):
+    post = request.get_json()
+    player_id = post['player_id']
+    from_territory = post['from_territory']
+    to_territory = post['to_territory']
+    troops = int(post['troops'])
+
+    g = [g for g in games if g.game_id == game_id]
+    
+    if g == []:
+        return jsonify({'error': 'Game not found'})
+    
+    g = g[0]
+
+    if g.turn_status != 'attacking':
+        return jsonify({'error': 'Not in attacking phase'})
+    
+    p = [p for p in g.players if p.name == player_id]
+
+    if p == []:
+        return jsonify({'error': 'Player not found'})
+
+    p = p[0]
+
+    from_territory_index = g.from_territory_name_get_territory_index(from_territory)
+    to_territory_index = g.from_territory_name_get_territory_index(to_territory)
+
+    if g.maps[from_territory_index]['troops'] <= troops:
+        return jsonify({'error': 'Not enough troops'})
+
+    if g.maps[from_territory_index]['owner'] != player_id:
+        return jsonify({'error': 'Not your territory'})
+
+    if g.maps[to_territory_index]['owner'] != player_id:
+        return jsonify({'error': 'Not your territory'})
+
+    if g.maps[from_territory_index]['neighbours'].count(to_territory) == 0:
+        return jsonify({'error': 'Territories are not neighbours'})
+
+    g.maps[to_territory_index]['troops'] += troops
+    g.maps[from_territory_index]['troops'] -= troops
+
+    return jsonify({'message': 'Troops moved'})
+
+@app.route('/api/game/<game_id>/play/attacking/end', methods=['POST'])
+def game_play_attacking_end(game_id):
+    post = request.get_json()
+    player_id = post['player_id']
+
+    g = [g for g in games if g.game_id == game_id]
+    
+    if g == []:
+        return jsonify({'error': 'Game not found'})
+    
+    g = g[0]
+
+    if g.turn_status != 'attacking':
+        return jsonify({'error': 'Not in attacking phase'})
+    
+    p = [p for p in g.players if p.name == player_id]
+
+    if p == []:
+        return jsonify({'error': 'Player not found'})
+
+    p = p[0]
+
+    g.turn_status = 'movement'
+
+    return jsonify({'message': 'Attacking phase ended'})
 
 if __name__ == '__main__':
     app.run("localhost", 3000, debug=True)
