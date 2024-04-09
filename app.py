@@ -43,7 +43,7 @@ def join_game():
     elif player_id in g.players:
         return jsonify({'error': 'Player already in game'})
 
-    g.add_player(player_id, 'blue' if len(g.players) == 2 else 'green')
+    g.add_player(player_id, 'blue' if len(g.players) == 2 else 'yellow')
 
     if len(g.players) == 2:
         return jsonify({'message': 'joined game, waiting for more players'})        
