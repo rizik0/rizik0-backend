@@ -22,7 +22,7 @@ def create_game():
     g = Game()
     games.append(g)
     g.add_player(creator, 'red')
-    return jsonify({'game_id': g.game_id})
+    return jsonify({'game_id': g.game_id, 'playerGoal': g.players[0].goal})
 
 # Definitive
 @app.route('/api/game/join', methods=['POST'])
@@ -45,14 +45,20 @@ def join_game():
 
     g.add_player(player_id, 'blue' if len(g.players) == 2 else 'yellow')
 
+    p = [p for p in g.players if p.name == player_id]
+
+    if p == []:
+        return jsonify({'error': 'Player not found'})
+    
+    p = p[0]
+
     if len(g.players) == 2:
-        return jsonify({'message': 'joined game, waiting for more players'})        
+        return jsonify({'message': 'joined game, waiting for more players', 'playerGoal': p.goal})        
     if len(g.players) == 3:
         g.shuffle_players()
         g.status = g.players[0].name
         g.assigning_maps_randomly()
-        return jsonify({'message': 'game full, starting game'})
-
+        return jsonify({'message': 'game full, starting game', 'playerGoal': p.goal})
     return jsonify({'game_id': g.game_id})
 
 
