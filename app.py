@@ -399,5 +399,54 @@ def game_play_attacking_end(game_id):
 
     return jsonify({'message': 'Attacking phase ended'})
 
+@app.route('/api/game/<game_id>/play/movement/', methods=['POST'])
+def game_play_movement(game_id):
+    post = request.get_json()
+    player_id = post['player_id']
+    from_territory = post['from_territory']
+    to_territory = post['to_territory']
+    troops = int(post['troops'])
+
+    g = [g for g in games if g.game_id == game_id]
+    
+    if g == []:
+        return jsonify({'error': 'Game not found'})
+    
+    g = g[0]
+
+    if g.turn_status != 'movement':
+        return jsonify({'error': 'Not in movement phase'})
+    
+    p = [p for p in g.players if p.name == player_id]
+
+    if p == []:
+        return jsonify({'error': 'Player not found'})
+
+    p = p[0]
+
+    from_territory_index = g.from_territory_name_get_territory_index(from_territory)
+    to_territory_index = g.from_territory_name_get_territory_index(to_territory)
+
+    if g.maps[from_territory_index]['troops'] <= troops:
+        return jsonify({'error': 'Not enough troops'})
+
+    if g.maps[from_territory_index]['owner'] != player_id:
+        return jsonify({'error': 'Not your territory'})
+
+    if g.maps[to_territory_index]['owner'] != player_id:
+        return jsonify({'error': 'Not your territory'})
+
+    if g.maps[from_territory_index]['neighbours'].count(to_territory) == 0:
+        return jsonify({'error': 'Territories are not neighbours'})
+
+    g.maps[to_territory_index]['troops'] += troops
+    g.maps[from_territory_index]['troops'] -= troops
+
+    g.turn += 1
+    g.turn_status = 'positioning'
+    g.status = g.players[g.turn % 3].name
+
+    return jsonify({'message': 'Troops moved'})
+
 if __name__ == '__main__':
     app.run("localhost", 3000, debug=True)
