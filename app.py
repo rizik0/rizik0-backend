@@ -269,10 +269,10 @@ def game_play_attacking(game_id):
     to_territory_index = g.from_territory_name_get_territory_index(to_territory)
 
     if g.maps[from_territory_index]['troops'] + 1 <= troops:
-        return jsonify({'error': 'Not enough troops'})
+        return jsonify({'error': 'Not enough troops, at least one troop needs to stay here'})
 
     if g.maps[from_territory_index]['owner'] != player_id:
-        return jsonify({'error': 'The territory you are sending troops from is not yours'})
+        return jsonify({'error': 'The territory you are moving troops from is not yours'})
 
     if g.maps[to_territory_index]['owner'] == player_id:
         return jsonify({'error': 'Cannot attack your own territory'})
@@ -369,10 +369,10 @@ def game_play_attacking_move(game_id):
         return jsonify({'error': 'Not enough troops'})
 
     if g.maps[from_territory_index]['owner'] != player_id:
-        return jsonify({'error': 'The territory you are sending troops from is not yours'})
+        return jsonify({'error': 'The territory you are moving troops from is not yours'})
 
     if g.maps[to_territory_index]['owner'] != player_id:
-        return jsonify({'error': 'The territory you are sending troops to is not yours'})
+        return jsonify({'error': 'The territory you are moving troops to is not yours'})
 
     if g.maps[from_territory_index]['neighbours'].count(to_territory) == 0:
         return jsonify({'error': 'Territories are not neighbours'})
@@ -440,10 +440,10 @@ def game_play_movement(game_id):
         return jsonify({'error': 'Not enough troops'})
 
     if g.maps[from_territory_index]['owner'] != player_id:
-        return jsonify({'error': 'The territory you are sending troops from is not yours'})
+        return jsonify({'error': 'The territory you are moving troops from is not yours'})
 
     if g.maps[to_territory_index]['owner'] != player_id:
-        return jsonify({'error': 'The territory you are sending troops to is not yours'})
+        return jsonify({'error': 'The territory you are moving troops to is not yours'})
 
     if g.maps[from_territory_index]['neighbours'].count(to_territory) == 0:
         return jsonify({'error': 'Territories are not neighbours'})
