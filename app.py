@@ -9,11 +9,7 @@ games = []
 
 CORS(app)
 
-@app.route('/api', methods=['GET'])
-def api():
-    return jsonify({'data': 'Hello, World!'})
 
-# Definitive
 @app.route('/api/game/create', methods=['POST'])
 def create_game():
     post = request.get_json()
@@ -24,7 +20,6 @@ def create_game():
     g.add_player(creator, 'red')
     return jsonify({'game_id': g.game_id, 'playerGoal': g.players[0].goal})
 
-# Definitive
 @app.route('/api/game/join', methods=['POST'])
 def join_game():
     post = request.get_json()
@@ -73,7 +68,6 @@ def game_status(game_id):
 
     return jsonify({'maps': g.maps, 'status': g.status, 'turn': g.turn, 'phase': g.turn_status, 'players': [{'name': p.name, 'color': p.color} for p in g.players]})
 
-# Temporary
 @app.route('/api/game/<game_id>/players', methods=['GET'])
 def game_players(game_id):
     g = [g for g in games if g.game_id == game_id]
@@ -138,6 +132,12 @@ def game_play_initial_place(game_id):
 
     if p.initial_units < troops:
         return jsonify({'error': 'Not enough troops'})
+    
+    if troops < 1:
+        return jsonify({'error': 'Cannot place less than 1 troop'})
+    
+    if g.maps[g.from_territory_name_get_territory_index(territory)]['owner'] != player_id:
+        return jsonify({'error': 'This territory is not yours'})
 
     p.initial_units -= troops
 
@@ -225,6 +225,12 @@ def game_play_positioning_place(game_id):
     if p.initial_units < troops:
         return jsonify({'error': 'Not enough troops'})
 
+    if troops < 1:
+        return jsonify({'error': 'Cannot place less than 1 troop'})
+    
+    if g.maps[g.from_territory_name_get_territory_index(territory)]['owner'] != player_id:
+        return jsonify({'error': 'This territory is not yours'})
+
     p.initial_units -= troops
 
     g.maps[g.from_territory_name_get_territory_index(territory)]['troops'] += troops
@@ -263,10 +269,10 @@ def game_play_attacking(game_id):
     to_territory_index = g.from_territory_name_get_territory_index(to_territory)
 
     if g.maps[from_territory_index]['troops'] + 1 <= troops:
-        return jsonify({'error': 'Not enough troops'})
+        return jsonify({'error': 'Not enough troops, at least one troop needs to stay here'})
 
     if g.maps[from_territory_index]['owner'] != player_id:
-        return jsonify({'error': 'Not your territory'})
+        return jsonify({'error': 'The territory you are moving troops from is not yours'})
 
     if g.maps[to_territory_index]['owner'] == player_id:
         return jsonify({'error': 'Cannot attack your own territory'})
@@ -356,14 +362,17 @@ def game_play_attacking_move(game_id):
     from_territory_index = g.from_territory_name_get_territory_index(from_territory)
     to_territory_index = g.from_territory_name_get_territory_index(to_territory)
 
+    if troops < 1:
+        return jsonify({'error': 'Cannot place less than 1 troop'})
+
     if g.maps[from_territory_index]['troops'] <= troops:
         return jsonify({'error': 'Not enough troops'})
 
     if g.maps[from_territory_index]['owner'] != player_id:
-        return jsonify({'error': 'Not your territory'})
+        return jsonify({'error': 'The territory you are moving troops from is not yours'})
 
     if g.maps[to_territory_index]['owner'] != player_id:
-        return jsonify({'error': 'Not your territory'})
+        return jsonify({'error': 'The territory you are moving troops to is not yours'})
 
     if g.maps[from_territory_index]['neighbours'].count(to_territory) == 0:
         return jsonify({'error': 'Territories are not neighbours'})
@@ -431,10 +440,10 @@ def game_play_movement(game_id):
         return jsonify({'error': 'Not enough troops'})
 
     if g.maps[from_territory_index]['owner'] != player_id:
-        return jsonify({'error': 'Not your territory'})
+        return jsonify({'error': 'The territory you are moving troops from is not yours'})
 
     if g.maps[to_territory_index]['owner'] != player_id:
-        return jsonify({'error': 'Not your territory'})
+        return jsonify({'error': 'The territory you are moving troops to is not yours'})
 
     if g.maps[from_territory_index]['neighbours'].count(to_territory) == 0:
         return jsonify({'error': 'Territories are not neighbours'})
