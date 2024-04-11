@@ -225,6 +225,12 @@ def game_play_positioning_place(game_id):
     if p.initial_units < troops:
         return jsonify({'error': 'Not enough troops'})
 
+    if troops < 1:
+        return jsonify({'error': 'Cannot place less than 1 troop'})
+    
+    if g.maps[g.from_territory_name_get_territory_index(territory)]['owner'] != player_id:
+        return jsonify({'error': 'This territory is not yours'})
+
     p.initial_units -= troops
 
     g.maps[g.from_territory_name_get_territory_index(territory)]['troops'] += troops
@@ -355,6 +361,9 @@ def game_play_attacking_move(game_id):
 
     from_territory_index = g.from_territory_name_get_territory_index(from_territory)
     to_territory_index = g.from_territory_name_get_territory_index(to_territory)
+
+    if troops < 1:
+        return jsonify({'error': 'Cannot place less than 1 troop'})
 
     if g.maps[from_territory_index]['troops'] <= troops:
         return jsonify({'error': 'Not enough troops'})
