@@ -315,20 +315,15 @@ def game_play_attacking(game_id):
             g.maps[from_territory_index]['troops'] -= 1
             attack_losses += 1
 
-    # g.maps[to_territory_index]['troops'] -= troops
-
-    # if g.maps[to_territory_index]['troops'] == 0:
-    #     g.maps[to_territory_index]['owner'] = player_id
-    #     g.maps[to_territory_index]['troops'] = troops
-    #     g.maps[from_territory_index]['troops'] -= troops
-    # else:
-    #     g.maps[from_territory_index]['troops'] -= troops
 
     if g.maps[to_territory_index]['troops'] == 0:
         g.maps[to_territory_index]['owner'] = player_id
         g.maps[to_territory_index]['color'] = p.color
         g.maps[to_territory_index]['troops'] = troops - attack_losses
         g.maps[from_territory_index]['troops'] -= troops
+
+        if g.has_a_full_continent(player_id, p.goal):
+            g.turn_status = 'won'
 
         return jsonify({'won': 'yes', 'attack_losses': attack_losses, 'defense_losses': defense_losses, 'attacking_dices': attacking_dices, 'defending_dices': defending_dices})
 

@@ -242,7 +242,7 @@ class Game:
         for updated_territory in updated_maps:
             self.maps[self.maps.index(updated_territory)]["troops"] = updated_territory["troops"]
 
-    def __has_anyone_won(self) -> Player:
+    def has_anyone_won(self) -> str:
         for player in self.players:
             if self.has_a_full_continent(player, player.goal):
                 return player
