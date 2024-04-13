@@ -35,12 +35,11 @@ def register():
     cursor = sqliteConnection.cursor()
 
     post = request.get_json()
-    
-    username = post['username']
-    email = post['email']
-    password_hash = post['password_hash']
+    print(post)
 
-    print(username, email, password_hash)
+    username = post[0]
+    email = post[1]
+    password_hash = post[2]
 
     cursor.execute('''INSERT INTO players (username,email,password_hash) VALUES (?, ?, ?);''', (username, email, bcrypt.generate_password_hash(password_hash).decode('utf-8')))
 
