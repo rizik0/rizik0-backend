@@ -4,32 +4,48 @@ from classes.Game import Game
 from random import randint
 import sqlite3
 from flask import g
+from flask_bcrypt import Bcrypt
+from flask_jwt_extended import JWTManager, jwt_required, get_current_user, get_jwt_identity
+from flask_jwt_extended import create_access_token
+from datetime import timedelta, datetime
+
+SECRET_KEY = "TommyCAT"
+ACCESS_EXPIRES = timedelta(hours=1)
 
 app = Flask(__name__)
 
 games = []
 
+app.config['JWT_SECRET_KEY'] = SECRET_KEY
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = ACCESS_EXPIRES
+
+bcrypt = Bcrypt(app)
+jwt = JWTManager(app)
+
 CORS(app)
 
-###################DATABASE############################################
+#DATABASE CONNECTION
+# sqliteConnection = sqlite3.connect('database.db')
+# cursor = sqliteConnection.cursor()
 
-DATABASE = './database.db'
 
-def get_db():
-    db = getattr(g, '_database', None)
-    if db is None:
-        db = g._database = sqlite3.connect(DATABASE)
-    return db
+@app.route('/api/player/register', methods=['POST'])
+def register():
+    sqliteConnection = sqlite3.connect('database.db')
+    cursor = sqliteConnection.cursor()
 
-@app.teardown_appcontext
-def close_connection(exception):
-    db = getattr(g, '_database', None)
-    if db is not None:
-        db.close()
+    post = request.get_json()
+    
+    username = post['username']
+    email = post['email']
+    password_hash = post['password_hash']
 
-@app.route('/api/login', methods=['POST'])
+    print(username, email, password_hash)
 
-################END DATABASE############################################
+    cursor.execute('''INSERT INTO players (username,email,password_hash) VALUES (?, ?, ?);''', (username, email, bcrypt.generate_password_hash(password_hash).decode('utf-8')))
+
+    sqliteConnection.commit()
+    return jsonify({'message': 'Player registered'})
 
 @app.route('/api/game/create', methods=['POST'])
 def create_game():

@@ -29,3 +29,13 @@ python3 -m pip install -r requirements.txt
 ![flow chart](https://github.com/rizik0/rizik0-backend/assets/112891194/576e6457-89b6-4a5e-aa4d-d453ebb33212)
 
 Account su SQL
+## Creare il database sqlite da file sql:
+```
+cat database.sql | sqlite3 database.db
+```
+## Leggere il database da terminale
+```
+sqlite3 database.db
+
+sqlite> select * from players;
+```
