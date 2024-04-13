@@ -2,6 +2,8 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from classes.Game import Game
 from random import randint
+import sqlite3
+from flask import g
 
 app = Flask(__name__)
 
@@ -9,6 +11,25 @@ games = []
 
 CORS(app)
 
+###################DATABASE############################################
+
+DATABASE = './database.db'
+
+def get_db():
+    db = getattr(g, '_database', None)
+    if db is None:
+        db = g._database = sqlite3.connect(DATABASE)
+    return db
+
+@app.teardown_appcontext
+def close_connection(exception):
+    db = getattr(g, '_database', None)
+    if db is not None:
+        db.close()
+
+@app.route('/api/login', methods=['POST'])
+
+################END DATABASE############################################
 
 @app.route('/api/game/create', methods=['POST'])
 def create_game():
