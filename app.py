@@ -30,7 +30,7 @@ def register():
     sqliteConnection = sqlite3.connect('database.db')
     cursor = sqliteConnection.cursor()
 
-    # post = request.get_json()
+    post = request.get_json()
     print(post)
 
     username = post[0]
