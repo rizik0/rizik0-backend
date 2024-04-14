@@ -39,3 +39,10 @@ sqlite3 database.db
 
 sqlite> select * from players;
 ```
+
+## Connettersi al database da python:
+```
+sqliteConnection = sqlite3.connect('database.db')
+cursor = sqliteConnection.cursor()
+```
+

@@ -24,10 +24,6 @@ jwt = JWTManager(app)
 
 CORS(app)
 
-#DATABASE CONNECTION
-# sqliteConnection = sqlite3.connect('database.db')
-# cursor = sqliteConnection.cursor()
-
 
 @app.route('/api/player/register', methods=['POST'])
 def register():
