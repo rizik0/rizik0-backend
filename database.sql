@@ -1,0 +1,1 @@
+create table players(username varchar(255) primary key,email varchar(255) not null,password_hash varchar(255) not null);

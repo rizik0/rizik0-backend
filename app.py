@@ -2,14 +2,74 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from classes.Game import Game
 from random import randint
+import sqlite3
+from flask import g
+from flask_bcrypt import Bcrypt
+from flask_jwt_extended import JWTManager, jwt_required, get_current_user, get_jwt_identity
+from flask_jwt_extended import create_access_token
+from datetime import timedelta, datetime
+
+SECRET_KEY = "TommyCAT"
+ACCESS_EXPIRES = timedelta(hours=1)
 
 app = Flask(__name__)
 
 games = []
 
+app.config['JWT_SECRET_KEY'] = SECRET_KEY
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = ACCESS_EXPIRES
+
+bcrypt = Bcrypt(app)
+jwt = JWTManager(app)
+
 CORS(app)
 
 
+@app.route('/api/player/register', methods=['POST'])
+def register():
+    sqliteConnection = sqlite3.connect('database.db')
+    cursor = sqliteConnection.cursor()
+
+    post = request.get_json()
+    print(post)
+
+    username = post[0]
+    email = post[1]
+    password_hash = post[2]
+
+    cursor.execute('''INSERT INTO players (username,email,password_hash) VALUES (?, ?, ?);''', (username, email, bcrypt.generate_password_hash(password_hash).decode('utf-8')))
+
+    sqliteConnection.commit()
+    return jsonify({'message': 'Player registered'})
+
+@app.route('/api/player/login', methods=['POST'])
+def login():
+    sqliteConnection = sqlite3.connect('database.db')
+    cursor = sqliteConnection.cursor()
+
+    post = request.get_json()
+    print(post)
+
+    username = post[0]
+    password = post[1]
+
+    cursor.execute('''SELECT * FROM players WHERE username = ?;''', (username))
+    player = cursor.fetchone()
+
+    if player == None:
+        return jsonify({'error': 'Player not found'})
+
+    if bcrypt.check_password_hash(player[2], password):
+        access_token = create_access_token(identity={'username':player[0],'email':player[1],'expires':(datetime.now() + timedelta(hours=1)).strftime("%m/%d/%Y, %H:%M:%S")})
+        result = access_token
+    else:
+        result = jsonify({'error': 'Wrong username/password'})
+
+    result = {'jwt': result}
+
+    print(jsonify(result))
+    return jsonify(result)
+    
 @app.route('/api/game/create', methods=['POST'])
 def create_game():
     post = request.get_json()
