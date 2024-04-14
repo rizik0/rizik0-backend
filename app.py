@@ -30,7 +30,7 @@ def register():
     sqliteConnection = sqlite3.connect('database.db')
     cursor = sqliteConnection.cursor()
 
-    post = request.get_json()
+    # post = request.get_json()
     print(post)
 
     username = post[0]
@@ -42,6 +42,34 @@ def register():
     sqliteConnection.commit()
     return jsonify({'message': 'Player registered'})
 
+@app.route('/api/player/login', methods=['POST'])
+def login():
+    sqliteConnection = sqlite3.connect('database.db')
+    cursor = sqliteConnection.cursor()
+
+    post = request.get_json()
+    print(post)
+
+    username = post[0]
+    password = post[1]
+
+    cursor.execute('''SELECT * FROM players WHERE username = ?;''', (username))
+    player = cursor.fetchone()
+
+    if player == None:
+        return jsonify({'error': 'Player not found'})
+
+    if bcrypt.check_password_hash(player[2], password):
+        access_token = create_access_token(identity={'username':player[0],'email':player[1],'expires':(datetime.now() + timedelta(hours=1)).strftime("%m/%d/%Y, %H:%M:%S")})
+        result = access_token
+    else:
+        result = jsonify({'error': 'Wrong username/password'})
+
+    result = {'jwt': result}
+
+    print(jsonify(result))
+    return jsonify(result)
+    
 @app.route('/api/game/create', methods=['POST'])
 def create_game():
     post = request.get_json()
