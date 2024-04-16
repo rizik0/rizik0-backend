@@ -84,22 +84,58 @@ def login():
 
     print(jsonify(result))
     return jsonify(result)
+
+@app.route('/api/player/profile', methods=['GET'])
+@jwt_required()
+def profile():
+    current_user = get_jwt_identity()
+
+    sqliteConnection = sqlite3.connect('database.db')
+    cursor = sqliteConnection.cursor()
+
+    cursor.execute('''SELECT count(*) FROM games WHERE winner = ?;''', (current_user['username'],))
+
+    wins = cursor.fetchone()[0]
+
+    cursor.execute('''SELECT count(*) FROM games WHERE player1 = ? OR player2 = ? OR player3 = ?;''', (current_user['username'], current_user['username'], current_user['username']))
+    
+    games = cursor.fetchone()[0]
+
+
+    return jsonify({'wins': wins, 'games': games})
+
+@app.route('/api/leaderboard', methods=['GET'])
+def leaderboard():
+    sqliteConnection = sqlite3.connect('database.db')
+    cursor = sqliteConnection.cursor()
+
+    cursor.execute('''
+        SELECT username, (SELECT count(*) FROM games WHERE winner = username) as wins 
+        FROM players
+        ORDER BY wins DESC;
+    ''')
+
+    leaders = cursor.fetchall()
+
+    return jsonify({'standings': leaders, 'potw': 'Scemo'})
+
     
 @app.route('/api/game/create', methods=['POST'])
+@jwt_required()
 def create_game():
-    post = request.get_json()
-    creator = post['player_id']
+    creator = get_jwt_identity()
 
     g = Game()
     games.append(g)
-    g.add_player(creator, 'red')
+    g.add_player(creator['username'], 'red')
     return jsonify({'game_id': g.game_id, 'playerGoal': g.players[0].goal})
 
 @app.route('/api/game/join', methods=['POST'])
+@jwt_required()
 def join_game():
     post = request.get_json()
     game_id = post['game_id']
-    player_id = post['player_id']
+    player_id = get_jwt_identity()['username']
 
     g = [g for g in games if g.game_id == game_id]
     
