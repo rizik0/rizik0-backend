@@ -12,16 +12,17 @@ import os
 import sqlite3
 
 #CONFIG
+#database.db removal
+if os.path.exists('database.db'):
+    os.remove('database.db')
 #database config
-if not os.path.exists('database.db'):
-    #save sql script
-    with open('database.sql', 'r') as sql_file:
-        sql_script = sql_file.read()
-    #execute sql script
-    conn = sqlite3.connect('database.db')
-    cursor = conn.cursor()
-    cursor.executescript(sql_script)
-    conn.close()
+with open('database.sql', 'r') as sql_file:
+    sql_script = sql_file.read()
+#execute sql script
+conn = sqlite3.connect('database.db')
+cursor = conn.cursor()
+cursor.executescript(sql_script)
+conn.close()
 
 #app config
 SECRET_KEY = "TommyCAT"
@@ -117,7 +118,7 @@ def leaderboard():
 
     leaders = cursor.fetchall()
 
-    return jsonify({'standings': leaders, 'potw': 'Scemo'})
+    return jsonify({'standings': leaders, 'potw': 'Cristian'})
 
     
 @app.route('/api/game/create', methods=['POST'])
