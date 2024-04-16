@@ -10,7 +10,6 @@ from flask_jwt_extended import create_access_token
 from datetime import timedelta, datetime
 import os
 import sqlite3
-import os
 
 #CONFIG
 #database.db removal
