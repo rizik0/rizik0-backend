@@ -118,7 +118,7 @@ def leaderboard():
 
     leaders = cursor.fetchall()
 
-    return jsonify({'standings': leaders, 'potw': 'Scemo'})
+    return jsonify({'standings': leaders, 'potw': 'Cristian'})
 
     
 @app.route('/api/game/create', methods=['POST'])
