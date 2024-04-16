@@ -8,7 +8,22 @@ from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager, jwt_required, get_current_user, get_jwt_identity
 from flask_jwt_extended import create_access_token
 from datetime import timedelta, datetime
+import os
+import sqlite3
 
+#CONFIG
+#database config
+if not os.path.exists('database.db'):
+    #save sql script
+    with open('database.sql', 'r') as sql_file:
+        sql_script = sql_file.read()
+    #execute sql script
+    conn = sqlite3.connect('database.db')
+    cursor = conn.cursor()
+    cursor.executescript(sql_script)
+    conn.close()
+
+#app config
 SECRET_KEY = "TommyCAT"
 ACCESS_EXPIRES = timedelta(hours=1)
 
@@ -24,7 +39,7 @@ jwt = JWTManager(app)
 
 CORS(app)
 
-
+#ROUTES
 @app.route('/api/player/register', methods=['POST'])
 def register():
     sqliteConnection = sqlite3.connect('database.db')
@@ -53,7 +68,7 @@ def login():
     username = post[0]
     password = post[1]
 
-    cursor.execute('''SELECT * FROM players WHERE username = ?;''', (username,)) # The comma is important
+    cursor.execute('''SELECT * FROM players WHERE username = ?;''', (username,))
     player = cursor.fetchone()
 
     if player == None:

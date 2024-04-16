@@ -18,3 +18,6 @@ create table games(
     foreign key(winner) references players(username)
 );
 
+insert into players(username,email,password_hash) values('admin1','email1@email.com','1234');
+insert into players(username,email,password_hash) values('admin2','email2@email.com','1234');
+insert into players(username,email,password_hash) values('admin3','email3@email.com','1234');
