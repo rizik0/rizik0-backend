@@ -205,9 +205,6 @@ def game_play_initial_get(game_id):
         return jsonify({'error': 'Game not found'})
     
     g = g[0]
-
-    if g.turn_status != 'initial':
-        return jsonify({'error': 'Not in initial phase'})
     
     p = [p for p in g.players if p.name == player_id]
 
@@ -231,9 +228,6 @@ def game_play_initial_place(game_id):
         return jsonify({'error': 'Game not found'})
     
     g = g[0]
-
-    if g.turn_status != 'initial':
-        return jsonify({'error': 'Not in initial phase'})
     
     p = [p for p in g.players if p.name == player_id]
 
@@ -436,6 +430,11 @@ def game_play_attacking(game_id):
 
         if g.has_a_full_continent(player_id, p.goal):
             g.turn_status = 'won'
+            sqliteConnection = sqlite3.connect('database.db')
+            cursor = sqliteConnection.cursor()
+            cursor.execute('''INSERT INTO games (player1, player2, player3, winner, winner_goal, match_year, match_month, match_day) VALUES (?, ?, ?, ?, ?, ?, ?, ?);''', (g.players[0].name, g.players[1].name, g.players[2].name, player_id, p.goal, 2024, 5, 23))
+            sqliteConnection.commit()
+            cursor.close()
 
         return jsonify({'won': 'yes', 'attack_losses': attack_losses, 'defense_losses': defense_losses, 'attacking_dices': attacking_dices, 'defending_dices': defending_dices})
 
