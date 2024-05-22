@@ -510,6 +510,9 @@ def game_play_attacking_end(game_id):
 
     p = p[0]
 
+    if p.name != g.status:
+        return jsonify({'error': 'Not your turn'})
+
     g.turn_status = 'movement'
 
     return jsonify({'message': 'Attacking phase ended'})
