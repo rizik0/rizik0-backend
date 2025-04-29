@@ -12,18 +12,6 @@ import os
 import sqlite3
 
 #CONFIG
-#database.db removal
-if os.path.exists('database.db'):
-    os.remove('database.db')
-#database config
-with open('database.sql', 'r') as sql_file:
-    sql_script = sql_file.read()
-#execute sql script
-conn = sqlite3.connect('database.db')
-cursor = conn.cursor()
-cursor.executescript(sql_script)
-conn.close()
-
 #app config
 SECRET_KEY = "TommyCAT"
 ACCESS_EXPIRES = timedelta(hours=1)
@@ -99,7 +87,7 @@ def profile():
     wins = cursor.fetchone()[0]
 
     cursor.execute('''SELECT count(*) FROM games WHERE player1 = ? OR player2 = ? OR player3 = ?;''', (current_user['username'], current_user['username'], current_user['username']))
-    
+
     games = cursor.fetchone()[0]
 
 
@@ -111,7 +99,7 @@ def leaderboard():
     cursor = sqliteConnection.cursor()
 
     cursor.execute('''
-        SELECT username, (SELECT count(*) FROM games WHERE winner = username) as wins 
+        SELECT username, (SELECT count(*) FROM games WHERE winner = username) as wins
         FROM players
         ORDER BY wins DESC;
     ''')
@@ -120,7 +108,7 @@ def leaderboard():
 
     return jsonify({'standings': leaders, 'potw': 'Cristian'})
 
-    
+
 @app.route('/api/game/create', methods=['POST'])
 @jwt_required()
 def create_game():
@@ -139,12 +127,12 @@ def join_game():
     player_id = get_jwt_identity()['username']
 
     g = [g for g in games if g.game_id == game_id]
-    
+
     if g == []:
         return jsonify({'error': 'Game not found'})
-    
+
     g = g[0]
-    
+
     if len(g.players) == 3:
         return jsonify({'error': 'Game is full'})
     elif player_id in g.players:
@@ -156,11 +144,11 @@ def join_game():
 
     if p == []:
         return jsonify({'error': 'Player not found'})
-    
+
     p = p[0]
 
     if len(g.players) == 2:
-        return jsonify({'message': 'joined game, waiting for more players', 'playerGoal': p.goal, 'playerColor': 'yellow'})        
+        return jsonify({'message': 'joined game, waiting for more players', 'playerGoal': p.goal, 'playerColor': 'yellow'})
     if len(g.players) == 3:
         g.shuffle_players()
         g.status = g.players[0].name
@@ -170,12 +158,12 @@ def join_game():
 
 
 @app.route('/api/game/<game_id>/status', methods=['GET'])
-def game_status(game_id):    
+def game_status(game_id):
     g = [g for g in games if g.game_id == game_id]
-    
+
     if g == []:
         return jsonify({'error': 'Game not found'})
-    
+
     g = g[0]
 
     return jsonify({'maps': g.maps, 'status': g.status, 'turn': g.turn, 'phase': g.turn_status, 'players': [{'name': p.name, 'color': p.color} for p in g.players]})
@@ -183,12 +171,12 @@ def game_status(game_id):
 @app.route('/api/game/<game_id>/players', methods=['GET'])
 def game_players(game_id):
     g = [g for g in games if g.game_id == game_id]
-    
+
     if g == []:
         return jsonify({'error': 'Game not found'})
-    
+
     g = g[0]
-    
+
     names = [{"name": p.name, "color": p.color} for p in g.players]
 
     return jsonify({'players': names})
@@ -200,12 +188,12 @@ def game_play_initial_get(game_id):
     player_id = post['player_id']
 
     g = [g for g in games if g.game_id == game_id]
-    
+
     if g == []:
         return jsonify({'error': 'Game not found'})
-    
+
     g = g[0]
-    
+
     p = [p for p in g.players if p.name == player_id]
 
     if p == []:
@@ -223,12 +211,12 @@ def game_play_initial_place(game_id):
     territory = post['territory']
 
     g = [g for g in games if g.game_id == game_id]
-    
+
     if g == []:
         return jsonify({'error': 'Game not found'})
-    
+
     g = g[0]
-    
+
     p = [p for p in g.players if p.name == player_id]
 
     if p == []:
@@ -238,10 +226,10 @@ def game_play_initial_place(game_id):
 
     if p.initial_units < troops:
         return jsonify({'error': 'Not enough troops'})
-    
+
     if troops < 1:
         return jsonify({'error': 'Cannot place less than 1 troop'})
-    
+
     if g.maps[g.from_territory_name_get_territory_index(territory)]['owner'] != player_id:
         return jsonify({'error': 'This territory is not yours'})
 
@@ -264,15 +252,15 @@ def game_play_positioning_get(game_id):
     player_id = post['player_id']
 
     g = [g for g in games if g.game_id == game_id]
-    
+
     if g == []:
         return jsonify({'error': 'Game not found'})
-    
+
     g = g[0]
 
     if g.turn_status != 'positioning':
         return jsonify({'error': 'Not in positioning phase'})
-    
+
     p = [p for p in g.players if p.name == player_id]
 
     if p == []:
@@ -295,13 +283,13 @@ def game_play_positioning_get(game_id):
         continent_bonus += 2
     if g.has_a_full_continent(p.name, 'south_america'):
         continent_bonus += 2
-    
+
     if int(g.turn/3) != 0 and int(g.turn/3) % 3 == 0:
         random_bonus = randint(6, 12)
-    
+
     if p.initial_units == 0:
         p.initial_units = int(g.from_player_receive_number_of_territories(p.name)/3) + continent_bonus + random_bonus
-    
+
     return jsonify({'troops': p.initial_units})
 
 @app.route('/api/game/<game_id>/play/positioning/place', methods=['POST'])
@@ -312,15 +300,15 @@ def game_play_positioning_place(game_id):
     territory = post['territory']
 
     g = [g for g in games if g.game_id == game_id]
-    
+
     if g == []:
         return jsonify({'error': 'Game not found'})
-    
+
     g = g[0]
 
     if g.turn_status != 'positioning':
         return jsonify({'error': 'Not in positioning phase'})
-    
+
     p = [p for p in g.players if p.name == player_id]
 
     if p == []:
@@ -333,7 +321,7 @@ def game_play_positioning_place(game_id):
 
     if troops < 1:
         return jsonify({'error': 'Cannot place less than 1 troop'})
-    
+
     if g.maps[g.from_territory_name_get_territory_index(territory)]['owner'] != player_id:
         return jsonify({'error': 'This territory is not yours'})
 
@@ -355,15 +343,15 @@ def game_play_attacking(game_id):
     troops = int(post['troops'])
 
     g = [g for g in games if g.game_id == game_id]
-    
+
     if g == []:
         return jsonify({'error': 'Game not found'})
-    
+
     g = g[0]
 
     if g.turn_status != 'attacking':
         return jsonify({'error': 'Not in attacking phase'})
-    
+
     p = [p for p in g.players if p.name == player_id]
 
     if p == []:
@@ -385,19 +373,19 @@ def game_play_attacking(game_id):
 
     if g.maps[from_territory_index]['neighbours'].count(to_territory) == 0:
         return jsonify({'error': 'Territories are not neighbours'})
-    
+
     if troops > 3:
         return jsonify({'error': 'Cannot attack with more than 3 troops'})
-    
+
     if troops < 1:
         return jsonify({'error': 'Cannot attack with less than 1 troop'})
-    
+
     defending_troops = g.maps[to_territory_index]['troops']
     attacking_troops = troops
 
     if defending_troops > 3:
         defending_troops = 3
-    
+
     attacking_dices = []
     defending_dices = []
 
@@ -449,15 +437,15 @@ def game_play_attacking_move(game_id):
     troops = int(post['troops'])
 
     g = [g for g in games if g.game_id == game_id]
-    
+
     if g == []:
         return jsonify({'error': 'Game not found'})
-    
+
     g = g[0]
 
     if g.turn_status != 'attacking':
         return jsonify({'error': 'Not in attacking phase'})
-    
+
     p = [p for p in g.players if p.name == player_id]
 
     if p == []:
@@ -494,15 +482,15 @@ def game_play_attacking_end(game_id):
     player_id = post['player_id']
 
     g = [g for g in games if g.game_id == game_id]
-    
+
     if g == []:
         return jsonify({'error': 'Game not found'})
-    
+
     g = g[0]
 
     if g.turn_status != 'attacking':
         return jsonify({'error': 'Not in attacking phase'})
-    
+
     p = [p for p in g.players if p.name == player_id]
 
     if p == []:
@@ -526,15 +514,15 @@ def game_play_movement(game_id):
     troops = int(post['troops'])
 
     g = [g for g in games if g.game_id == game_id]
-    
+
     if g == []:
         return jsonify({'error': 'Game not found'})
-    
+
     g = g[0]
 
     if g.turn_status != 'movement':
         return jsonify({'error': 'Not in movement phase'})
-    
+
     p = [p for p in g.players if p.name == player_id]
 
     if p == []:
