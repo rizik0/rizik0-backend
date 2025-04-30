@@ -1,0 +1,27 @@
+name: Deploy Flask App to Oracle Server
+
+on:
+  push:
+    branches:
+      - main  # You can change this to the branch you want to watch
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v2
+
+    - name: Set up SSH
+      uses: webfactory/ssh-agent@v0.5.3
+      with:
+        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+    - name: SSH into Oracle Server and Deploy
+      run: |
+        ssh -o StrictHostKeyChecking=no user@your-server-ip << 'EOF'
+          cd home/ubuntu/rizik0-backend
+          git pull origin main
+          sudo systemctl restart rizik0-backend
+        EOF
