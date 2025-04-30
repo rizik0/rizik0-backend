@@ -21,7 +21,7 @@ jobs:
     - name: SSH into Oracle Server and Deploy
       run: |
         ssh -o StrictHostKeyChecking=no ubuntu@89.168.29.38 << 'EOF'
-          cd home/ubuntu/rizik0-backend
+          cd home/ubuntu/rizik0_backend
           git pull origin main
-          sudo systemctl restart rizik0-backend
+          sudo systemctl restart rizik0_backend
         EOF
