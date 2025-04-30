@@ -12,7 +12,7 @@ import os
 import sqlite3
 
 #CONFIG
-#app config
+#app config EXTRATEST
 SECRET_KEY = "TommyCAT"
 ACCESS_EXPIRES = timedelta(hours=1)
 
