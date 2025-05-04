@@ -35,7 +35,6 @@ def register():
     cursor = sqliteConnection.cursor()
 
     post = request.get_json()
-    print(post)
 
     username = post[0]
     email = post[1]
@@ -52,7 +51,6 @@ def login():
     cursor = sqliteConnection.cursor()
 
     post = request.get_json()
-    print(post)
 
     username = post[0]
     password = post[1]
@@ -71,7 +69,6 @@ def login():
 
     result = {'jwt': result}
 
-    print(jsonify(result))
     return jsonify(result)
 
 @app.route('/api/player/profile', methods=['GET'])
