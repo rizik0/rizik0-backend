@@ -112,13 +112,9 @@ def login():
 
     if bcrypt.check_password_hash(player[2], password):
         access_token = create_access_token(identity={'username':player[0],'email':player[1],'expires':(datetime.now() + timedelta(hours=1)).strftime("%m/%d/%Y, %H:%M:%S")})
-        result = access_token
+        return jsonify({'jwt': access_token})
     else:
-        result = jsonify({'error': 'Wrong username/password'})
-
-    result = {'jwt': result}
-
-    return jsonify(result)
+        return jsonify({'error': 'Wrong username/password'})
 
 @app.route('/api/player/profile', methods=['GET'])
 @jwt_required()
