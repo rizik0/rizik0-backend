@@ -600,5 +600,15 @@ def game_play_movement(game_id):
 
     return jsonify({'message': 'Troops moved'})
 
+@app.errorhandler(500)
+def handle_internal_server_error(e):
+    # Log the error e for debugging
+    app.logger.error(f"Internal Server Error: {e}", exc_info=True)
+    return jsonify(error="An internal server error occurred."), 500
+
+@app.errorhandler(404)
+def handle_not_found(e):
+    return jsonify(error="Resource not found."), 404
+
 if __name__ == '__main__':
-    app.run("localhost", 3000, debug=True)
+    app.run("localhost", 3000, debug=False)
