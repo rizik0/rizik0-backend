@@ -99,22 +99,31 @@ def login():
     sqliteConnection = sqlite3.connect('database.db')
     cursor = sqliteConnection.cursor()
 
-    post = request.get_json()
+    try:
+        post = request.get_json()
 
-    username = post[0]
-    password = post[1]
+        username = post[0]
+        password = post[1]
 
-    cursor.execute('''SELECT * FROM players WHERE username = ?;''', (username,))
-    player = cursor.fetchone()
+        cursor.execute('''SELECT * FROM players WHERE username = ?;''', (username,))
+        player = cursor.fetchone()
 
-    if player == None:
-        return jsonify({'error': 'Player not found'})
+        if player is None:
+            return jsonify({'error': 'Player not found'})
 
-    if bcrypt.check_password_hash(player[2], password):
-        access_token = create_access_token(identity={'username':player[0],'email':player[1],'expires':(datetime.now() + timedelta(hours=1)).strftime("%m/%d/%Y, %H:%M:%S")})
-        return jsonify({'jwt': access_token})
-    else:
-        return jsonify({'error': 'Wrong username/password'})
+        if bcrypt.check_password_hash(player[2], password):
+            access_token = create_access_token(identity={
+                'username': player[0],
+                'email': player[1],
+                'expires': (datetime.now() + timedelta(hours=1)).strftime("%m/%d/%Y, %H:%M:%S")
+            })
+            return jsonify({'jwt': access_token})
+        else:
+            return jsonify({'error': 'Wrong username/password'})
+    finally:
+        # Always close your database connection
+        cursor.close()
+        sqliteConnection.close()
 
 @app.route('/api/player/profile', methods=['GET'])
 @jwt_required()
