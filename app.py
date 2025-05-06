@@ -28,7 +28,36 @@ jwt = JWTManager(app)
 
 CORS(app)
 
+# Add this function for password validation
+def validate_password(password):
+    """
+    Validates password strength based on multiple criteria
+    Returns: (is_valid, error_message)
+    """
+    # Check password length
+    if len(password) < 8:
+        return False, "Password must be at least 8 characters long"
+    
+    # Check for at least one uppercase letter
+    if not re.search(r'[A-Z]', password):
+        return False, "Password must contain at least one uppercase letter"
+    
+    # Check for at least one lowercase letter
+    if not re.search(r'[a-z]', password):
+        return False, "Password must contain at least one lowercase letter"
+    
+    # Check for at least one digit
+    if not re.search(r'\d', password):
+        return False, "Password must contain at least one number"
+    
+    # Check for at least one special character
+    if not re.search(r'[!@#$%^&*(),.?":{}|<>]', password):
+        return False, "Password must contain at least one special character"
+    
+    return True, "Password meets security requirements"
+
 #ROUTES
+# Update your register route
 @app.route('/api/player/register', methods=['POST'])
 def register():
     sqliteConnection = sqlite3.connect('database.db')
@@ -38,12 +67,23 @@ def register():
 
     username = post[0]
     email = post[1]
-    password_hash = post[2]
+    password = post[2]  # Changed variable name for clarity
+    
+    # Validate password strength
+    is_valid, message = validate_password(password)
+    if not is_valid:
+        return make_response(jsonify({'error': message}), 400)
 
-    cursor.execute('''INSERT INTO players (username,email,password_hash) VALUES (?, ?, ?);''', (username, email, bcrypt.generate_password_hash(password_hash).decode('utf-8')))
+    # If password is valid, proceed with registration
+    hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
+    
+    cursor.execute('''INSERT INTO players (username,email,password_hash) VALUES (?, ?, ?);''', 
+                  (username, email, hashed_password))
 
     sqliteConnection.commit()
-    return jsonify({'message': 'Player registered'})
+    sqliteConnection.close()  # Added to properly close connection
+    
+    return jsonify({'message': 'Player registered successfully'})
 
 @app.route('/api/player/login', methods=['POST'])
 def login():
