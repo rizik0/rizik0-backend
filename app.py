@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, make_response
 from flask_cors import CORS
 from classes.Game import Game
 from random import randint
@@ -10,6 +10,7 @@ from flask_jwt_extended import create_access_token
 from datetime import timedelta, datetime
 import os
 import sqlite3
+import re
 
 #CONFIG
 #app config EXTRATEST
