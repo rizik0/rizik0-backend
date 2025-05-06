@@ -18,8 +18,8 @@ load_dotenv()
 
 # Get secrets from environment variables
 JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY')
-if not SECRET_KEY:
-    raise ValueError("No SECRET_KEY set for Flask application")
+if not JWT_SECRET_KEY:
+    raise ValueError("No JWT_SECRET_KEY set for Flask application")
 
 ACCESS_EXPIRES = timedelta(hours=1)
 
