@@ -27,7 +27,7 @@ app.config["JWT_ACCESS_TOKEN_EXPIRES"] = ACCESS_EXPIRES
 bcrypt = Bcrypt(app)
 jwt = JWTManager(app)
 
-CORS(app)
+CORS(app, resources={r"/*": {"origins": ["https://rizik0.ovh", "https://api.rizik0.ovh"]}})
 
 # Add this function for password validation
 def validate_password(password):
