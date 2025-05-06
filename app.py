@@ -11,23 +11,31 @@ from datetime import timedelta, datetime
 import os
 import sqlite3
 import re
+from dotenv import load_dotenv
 
-#CONFIG
-#app config EXTRATEST
-SECRET_KEY = "TommyCAT"
+# Load environment variables from .env file
+load_dotenv()
+
+# Get secrets from environment variables
+JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY')
+if not SECRET_KEY:
+    raise ValueError("No SECRET_KEY set for Flask application")
+
 ACCESS_EXPIRES = timedelta(hours=1)
 
 app = Flask(__name__)
 
 games = []
 
-app.config['JWT_SECRET_KEY'] = SECRET_KEY
+app.config['JWT_SECRET_KEY'] = JWT_SECRET_KEY
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = ACCESS_EXPIRES
+app.config['JWT_COOKIE_SECURE'] = True  # Only send cookies over HTTPS
+app.config['JWT_COOKIE_CSRF_PROTECT'] = True  # Enable CSRF protection
 
 bcrypt = Bcrypt(app)
 jwt = JWTManager(app)
 
-CORS(app, resources={r"/*": {"origins": ["https://rizik0.ovh", "https://api.rizik0.ovh"]}})
+CORS(app)
 
 # Add this function for password validation
 def validate_password(password):

@@ -1,3 +1,4 @@
 classes/__pycache__/*
 rizik0/*
 database.db
+.env
